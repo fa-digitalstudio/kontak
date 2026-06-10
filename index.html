@@ -25,7 +25,7 @@
             padding: 40px 20px;
         }
 
-        /* === BARU: STYLING HALAMAN LOGIN === */
+        /* === STYLING HALAMAN LOGIN === */
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -87,7 +87,6 @@
         .toggle-pwd-btn:hover {
             color: #25D366;
         }
-        /* ================================== */
 
         .container {
             background: #ffffff;
@@ -98,7 +97,35 @@
             box-shadow: 0 15px 35px rgba(4, 38, 20, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.02);
             margin-bottom: 25px;
+            position: relative; /* Diperlukan untuk tombol absolute di dalamnya */
         }
+
+        /* === BARU: STYLING TOMBOL LOGOUT === */
+        .btn-logout-main {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff0f2;
+            color: #e11d48;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+            font-size: 15px;
+        }
+
+        .btn-logout-main:hover {
+            background: #e11d48;
+            color: #ffffff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
+        }
+        /* ================================== */
 
         .header {
             text-align: center;
@@ -388,7 +415,7 @@
 
         .empty-state { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
 
-        /* === STYLING POPUP MODAL === */
+        /* === STYLING POPUP MODAL UMUM === */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -466,6 +493,12 @@
         }
         .modal-btn-chat { background: #25D366; color: white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); }
         .modal-btn-chat:hover { background: #1ebd58; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
+
+        /* BARU: Styling Tambahan untuk Tombol Modal Logout */
+        .modal-btn-cancel { background: #f1f5f9; color: #475569; }
+        .modal-btn-cancel:hover { background: #e2e8f0; }
+        .modal-btn-danger { background: #e11d48; color: white; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); }
+        .modal-btn-danger:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(225, 29, 72, 0.3); }
     </style>
 </head>
 <body>
@@ -504,6 +537,10 @@
 
     <div id="mainApp" class="main-app">
         <div class="container">
+            <button class="btn-logout-main" onclick="showLogoutPopup()" title="Keluar">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+
             <div class="header">
                 <div class="icon-box">
                     <i class="fa-solid fa-address-book"></i>
@@ -516,7 +553,7 @@
                 <label for="nama">Nama Kontak</label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
-                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Farid Ganteng (WA)">
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
                 </div>
             </div>
 
@@ -584,17 +621,29 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal-overlay" id="logoutModal">
+            <div class="modal-box">
+                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </div>
+                <h3 class="modal-name">Konfirmasi Keluar</h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin keluar dari aplikasi? Sandi Anda yang tersimpan akan dihapus.</p>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" onclick="closeLogoutPopup()">Batal</button>
+                    <button class="modal-btn modal-btn-danger" onclick="confirmLogout()">Ya, Keluar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // === PENGATURAN PASSWORD & LOGIN ===
-        const APP_PASSWORD = "faridaris28"; // <-- SILAKAN UBAH PASSWORD DI SINI
+        const APP_PASSWORD = "admin123"; // <-- SILAKAN UBAH PASSWORD DI SINI
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Cek apakah user pernah centang "Simpan sandi di perangkat"
             const savedPassword = localStorage.getItem('wa_app_saved_password');
             if (savedPassword === APP_PASSWORD) {
-                // Jika cocok, langsung masuk ke app
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('mainApp').classList.add('active');
             }
@@ -608,11 +657,10 @@
                 if (rememberMe) {
                     localStorage.setItem('wa_app_saved_password', inputVal);
                 }
-                // Sembunyikan form login dengan efek transisi, munculkan app utama
                 document.getElementById('loginOverlay').classList.add('hidden');
                 setTimeout(() => {
                     document.getElementById('mainApp').classList.add('active');
-                }, 200); // Menunggu transisi login overlay selesai sebentar
+                }, 200); 
             } else {
                 alert("Password yang Anda masukkan salah!");
             }
@@ -637,6 +685,29 @@
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
             }
+        }
+
+        // === BARU: FUNGSI UNTUK LOGOUT ===
+        function showLogoutPopup() {
+            document.getElementById('logoutModal').classList.add('active');
+        }
+
+        function closeLogoutPopup() {
+            document.getElementById('logoutModal').classList.remove('active');
+        }
+
+        function confirmLogout() {
+            // Hapus sandi yang disimpan
+            localStorage.removeItem('wa_app_saved_password');
+            
+            // Reset input form
+            document.getElementById('appPasswordInput').value = '';
+            document.getElementById('rememberMeCheck').checked = false;
+            
+            // Tutup modal logout dan pindah halaman
+            closeLogoutPopup();
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('loginOverlay').classList.remove('hidden');
         }
         // ===================================
 
@@ -900,10 +971,15 @@
             document.getElementById('contactModal').classList.remove('active');
         }
 
+        // BARU: Perbaikan event global window.onclick untuk menutup semua jenis modal
         window.onclick = function(event) {
-            const modal = document.getElementById('contactModal');
-            if (event.target === modal) {
+            const contactModal = document.getElementById('contactModal');
+            const logoutModal = document.getElementById('logoutModal');
+            
+            if (event.target === contactModal) {
                 closeContactPopup();
+            } else if (event.target === logoutModal) {
+                closeLogoutPopup();
             }
         }
 
