@@ -230,7 +230,7 @@
             box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
         }
 
-        /* === BARU: Styling Kotak Pencarian === */
+        /* === STYLING KOTAK PENCARIAN === */
         .search-container {
             margin-bottom: 15px;
             display: none; /* Diatur via JS, muncul hanya jika ada kontak */
@@ -363,7 +363,7 @@
         </div>
 
         <p class="note">
-            <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di browser perangkat Anda.
+            <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di spreadsheet perangkat Anda.
         </p>
     </div>
 
@@ -378,7 +378,7 @@
             </button>
         </div>
         
-        <!-- BARU: Input Pencarian Real-time -->
+        <!-- Input Pencarian Real-time -->
         <div class="search-container" id="searchContainer">
             <div class="search-wrapper">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -387,7 +387,7 @@
         </div>
         
         <ul id="contactList" class="contact-list">
-            <li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>
+            <li class="empty-state" id="emptyState">Memuat data dari Google Sheets...</li>
         </ul>
     </div>
 
@@ -400,15 +400,13 @@
         };
 
         function loadContactsFromStorage() {
-            const localData = localStorage.getItem('wa_contacts_premium_v2');
-            if (localData) {
-                savedContacts = JSON.parse(localData);
+            google.script.run.withSuccessHandler(function(contacts) {
+                savedContacts = contacts;
                 renderContactList();
-            }
+            }).loadContactsFromSheet();
         }
 
         function saveContactsToStorage() {
-            localStorage.setItem('wa_contacts_premium_v2', JSON.stringify(savedContacts));
             renderContactList();
         }
 
@@ -433,14 +431,16 @@
             downloadSingleVCF(nama, nomor);
 
             const newContact = {
-                id: Date.now() + Math.random(),
+                id: "ID_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
                 name: nama,
                 phone: nomor
             };
+            
             savedContacts.unshift(newContact);
             saveContactsToStorage();
+            
+            google.script.run.saveContactToSheet(newContact.id, newContact.name, newContact.phone);
 
-            // Reset pencarian jika ada text agar kontak baru langsung terlihat
             document.getElementById('searchInput').value = "";
 
             namaInput.value = "";
@@ -463,6 +463,7 @@
                 }
 
                 let importedCount = 0;
+                let importedBatch = [];
 
                 matches.forEach(vcard => {
                     let nameMatch = vcard.match(/FN:(.*)/);
@@ -484,20 +485,24 @@
                         const isDuplicate = savedContacts.some(c => c.phone === phone);
                         
                         if (!isDuplicate && name && phone) {
-                            savedContacts.push({
-                                id: Date.now() + Math.random(),
+                            let c = {
+                                id: "ID_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
                                 name: name,
                                 phone: phone
-                            });
+                            };
+                            savedContacts.push(c);
+                            importedBatch.push(c);
                             importedCount++;
                         }
                     }
                 });
 
                 if (importedCount > 0) {
-                    document.getElementById('searchInput').value = ""; // Reset form pencarian
+                    document.getElementById('searchInput').value = "";
                     saveContactsToStorage();
-                    alert(`Berhasil mengimpor ${importedCount} kontak baru ke dalam daftar!`);
+                    google.script.run.withSuccessHandler(function() {
+                        alert(`Berhasil mengimpor ${importedCount} kontak baru ke dalam daftar Google Sheets!`);
+                    }).saveBulkContactsToSheet(importedBatch);
                 } else {
                     alert("Tidak ada kontak baru yang ditambahkan (mungkin nomor sudah terdaftar semua).");
                 }
@@ -508,13 +513,11 @@
             reader.readAsText(file);
         }
 
-        // FITUR BARU: Fungsi untuk memfilter list berdasarkan input pencarian
         function filterContacts() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             const items = document.querySelectorAll('.contact-item');
             let hasResults = false;
 
-            // Hapus pesan "tidak ditemukan" yang lama jika ada
             const oldNoResult = document.getElementById('noSearchResult');
             if (oldNoResult) oldNoResult.remove();
 
@@ -522,7 +525,6 @@
                 const nameText = item.querySelector('.contact-name-text').textContent.toLowerCase();
                 const phoneText = item.querySelector('.contact-phone-text').textContent.toLowerCase();
 
-                // COCOKKAN NAMA ATAU NOMOR TELEPON
                 if (nameText.includes(keyword) || phoneText.includes(keyword)) {
                     item.style.display = 'flex';
                     hasResults = true;
@@ -531,7 +533,6 @@
                 }
             });
 
-            // Tampilkan pesan jika tidak ada kontak yang cocok dengan keyword
             if (!hasResults && savedContacts.length > 0) {
                 const contactList = document.getElementById('contactList');
                 const li = document.createElement('li');
@@ -552,12 +553,12 @@
             if (savedContacts.length === 0) {
                 contactList.innerHTML = `<li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>`;
                 btnDownloadAll.style.display = "none";
-                searchContainer.style.display = "none"; // Sembunyikan kolom pencarian jika database kosong
+                searchContainer.style.display = "none";
                 return;
             }
 
             btnDownloadAll.style.display = "flex";
-            searchContainer.style.display = "block"; // Munculkan kolom pencarian jika ada minimal 1 kontak
+            searchContainer.style.display = "block";
 
             savedContacts.forEach(contact => {
                 const li = document.createElement('li');
@@ -574,7 +575,7 @@
                         <a href="https://wa.me/${contact.phone}" target="_blank" class="action-list-btn btn-list-wa" title="Chat WA">
                             <i class="fa-brands fa-whatsapp"></i>
                         </a>
-                        <button class="action-list-btn btn-list-del" onclick="deleteContact(${contact.id})" title="Hapus Kontak">
+                        <button class="action-list-btn btn-list-del" onclick="deleteContact('${contact.id}')" title="Hapus Kontak">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -582,7 +583,6 @@
                 contactList.appendChild(li);
             });
 
-            // Jalankan filter ulang jika user sedang mengetik saat merender (misal sehabis hapus data)
             filterContacts();
         }
 
@@ -630,6 +630,7 @@
             if (confirm("Apakah Anda yakin ingin menghapus kontak ini dari daftar?")) {
                 savedContacts = savedContacts.filter(item => item.id !== id);
                 saveContactsToStorage();
+                google.script.run.deleteContactFromSheet(id);
             }
         }
     </script>
