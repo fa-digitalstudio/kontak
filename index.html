@@ -528,7 +528,7 @@
                 <p>Masukkan kata sandi untuk membuka aplikasi</p>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 30px;">
                 <label for="appPasswordInput">Password</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-key"></i>
@@ -568,7 +568,7 @@
                 <label for="nama">Nama Kontak</label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
-                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Farid Ganteng (WA)">
                 </div>
             </div>
 
@@ -666,7 +666,7 @@
                 <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus <b>SEMUA</b> kontak? Tindakan ini tidak dapat dibatalkan.</p>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeDeleteAllPopup()">Batal</button>
-                    <button class="modal-btn modal-btn-danger" onclick="confirmDeleteAll()">Ya, Hapus Semua</button>
+                    <button class="modal-btn modal-btn-danger" id="btnConfirmDeleteAll" onclick="confirmDeleteAll()">Ya, Hapus Semua</button>
                 </div>
             </div>
         </div>
@@ -688,9 +688,10 @@
 
     <script>
         // === PENGATURAN PASSWORD & API KEY ===
-        const APP_PASSWORD = "admin123"; 
+        const APP_PASSWORD = "faridaris28"; 
         const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
         
+        // Memori sementara untuk kontak selama sesi berjalan
         let savedContacts = [];
 
         // Mengecek apakah sebelumnya password disimpan di perangkat
@@ -707,7 +708,7 @@
             const rememberMe = document.getElementById('rememberMeCheck')?.checked;
 
             if (inputVal === APP_PASSWORD) {
-                // Jika dicentang, simpan di localStorage perangkat
+                // Jika dicentang, simpan di localStorage perangkat (hanya password)
                 if (rememberMe) {
                     localStorage.setItem('wa_app_saved_password', inputVal);
                 }
@@ -993,21 +994,36 @@
             document.getElementById('deleteAllModal').classList.remove('active');
         }
 
-        function confirmDeleteAll() {
+        // PERUBAHAN UTAMA: Menggunakan fungsi async untuk memproses antrean hapus massal Google Sheets
+        async function confirmDeleteAll() {
+            const btnConfirm = document.getElementById('btnConfirmDeleteAll');
+            btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Menghapus...';
+            btnConfirm.disabled = true;
+
+            // Menyalin list id ke memori lokal
             const idsToDelete = savedContacts.map(c => c.id);
             
-            // Kosongkan dari UI langsung
+            // Kosongkan dari tampilan UI
             savedContacts = [];
             renderContactList();
             
-            // Kirim penghapusan API
-            idsToDelete.forEach(id => {
-                fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "delete", id: id })
-                }).catch(err => console.error(err));
-            });
+            // Mengirim data hapus satu-per-satu dengan proses tunggu (antre/async await) 
+            // agar mencegah penolakan dari Google Apps Script akibat request bersamaan
+            if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
+                for (const id of idsToDelete) {
+                    try {
+                        await fetch(API_URL, {
+                            method: "POST",
+                            body: JSON.stringify({ action: "delete", id: id })
+                        });
+                    } catch (err) {
+                        console.error("Gagal menghapus", id, err);
+                    }
+                }
+            }
             
+            btnConfirm.innerHTML = 'Ya, Hapus Semua';
+            btnConfirm.disabled = false;
             closeDeleteAllPopup();
         }
         
