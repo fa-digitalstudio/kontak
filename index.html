@@ -71,7 +71,6 @@
             color: #25D366;
         }
 
-        /* Styling untuk kotak centang password */
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -227,6 +226,13 @@
         .btn-download:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 25px rgba(37, 211, 102, 0.35);
+        }
+
+        .btn-download:disabled {
+            background: #a5d6a7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-upload-file {
@@ -544,7 +550,7 @@
                 <label for="rememberMeCheck" style="margin-bottom: 0; cursor: pointer;">Simpan kata sandi di perangkat ini</label>
             </div>
 
-            <button class="btn-download" style="width: 100%;" onclick="verifyPassword()">
+            <button id="btnLogin" class="btn-download" style="width: 100%;" onclick="verifyPassword()">
                 <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
             </button>
         </div>
@@ -568,7 +574,7 @@
                 <label for="nama">Nama Kontak</label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
-                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Farid Ganteng (WA)">
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
                 </div>
             </div>
 
@@ -687,39 +693,71 @@
     </div>
 
     <script>
-        // === PENGATURAN PASSWORD & API KEY ===
-        const APP_PASSWORD = "faridaris28"; 
+        // HANYA MASUKKAN 1 URL API GOOGLE SHEETS ANDA (Tidak ada teks APP_PASSWORD di sini)
         const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
         
-        // Memori sementara untuk kontak selama sesi berjalan
         let savedContacts = [];
 
-        // Mengecek apakah sebelumnya password disimpan di perangkat
+        // === FUNGSI KEAMANAN / LOGIN (Password dicek di server) ===
         document.addEventListener('DOMContentLoaded', () => {
             const savedPassword = localStorage.getItem('wa_app_saved_password');
-            if (savedPassword === APP_PASSWORD) {
-                document.getElementById('loginOverlay').classList.add('hidden');
-                document.getElementById('mainApp').classList.add('active');
+            if (savedPassword) {
+                // Verifikasi password yang tersimpan ke server secara otomatis
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', password: savedPassword })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('loginOverlay').classList.add('hidden');
+                        document.getElementById('mainApp').classList.add('active');
+                        loadContactsFromAPI();
+                    } else {
+                        localStorage.removeItem('wa_app_saved_password');
+                    }
+                })
+                .catch(err => console.error("Auto login error", err));
             }
         });
 
         function verifyPassword() {
             const inputVal = document.getElementById('appPasswordInput').value;
             const rememberMe = document.getElementById('rememberMeCheck')?.checked;
+            
+            const btn = document.getElementById('btnLogin');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...';
+            btn.disabled = true;
 
-            if (inputVal === APP_PASSWORD) {
-                // Jika dicentang, simpan di localStorage perangkat (hanya password)
-                if (rememberMe) {
-                    localStorage.setItem('wa_app_saved_password', inputVal);
+            // Mengirim request ke Backend Google untuk mengecek password
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', password: inputVal })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    if (rememberMe) {
+                        localStorage.setItem('wa_app_saved_password', inputVal);
+                    }
+                    document.getElementById('loginOverlay').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('mainApp').classList.add('active');
+                        loadContactsFromAPI(); // Muat kontak setelah sukses masuk
+                    }, 200); 
+                } else {
+                    alert("Password yang Anda masukkan salah!");
                 }
-
-                document.getElementById('loginOverlay').classList.add('hidden');
-                setTimeout(() => {
-                    document.getElementById('mainApp').classList.add('active');
-                }, 200); 
-            } else {
-                alert("Password yang Anda masukkan salah!");
-            }
+            })
+            .catch(err => {
+                alert("Terjadi kesalahan jaringan.");
+                console.error(err);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
         }
 
         function handleEnter(e) {
@@ -752,13 +790,16 @@
         }
 
         function confirmLogout() {
-            // Hapus password yang disimpan di perangkat ketika keluar
+            // Hapus password yang disimpan di perangkat
             localStorage.removeItem('wa_app_saved_password');
             
-            // Reset input
             document.getElementById('appPasswordInput').value = '';
             const rememberMeCheck = document.getElementById('rememberMeCheck');
             if(rememberMeCheck) rememberMeCheck.checked = false;
+            
+            // Kosongkan list di memori HP agar aman
+            savedContacts = [];
+            document.getElementById('contactList').innerHTML = `<li class="empty-state" id="emptyState">Memuat data dari server...</li>`;
             
             closeLogoutPopup();
             document.getElementById('mainApp').classList.remove('active');
@@ -766,10 +807,7 @@
         }
 
 
-        window.onload = function() {
-            loadContactsFromAPI();
-        };
-
+        // === FUNGSI UTAMA APLIKASI KONTAK ===
         function loadContactsFromAPI() {
             fetch(API_URL + "?action=load")
                 .then(res => res.json())
@@ -807,11 +845,9 @@
                 phone: nomor
             };
             
-            // Simpan ke memory dan update UI langsung
             savedContacts.unshift(newContact);
             renderContactList();
 
-            // Simpan ke API
             fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: "save", id: newContact.id, name: newContact.name, phone: newContact.phone })
@@ -994,21 +1030,16 @@
             document.getElementById('deleteAllModal').classList.remove('active');
         }
 
-        // PERUBAHAN UTAMA: Menggunakan fungsi async untuk memproses antrean hapus massal Google Sheets
         async function confirmDeleteAll() {
             const btnConfirm = document.getElementById('btnConfirmDeleteAll');
             btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang Menghapus...';
             btnConfirm.disabled = true;
 
-            // Menyalin list id ke memori lokal
             const idsToDelete = savedContacts.map(c => c.id);
             
-            // Kosongkan dari tampilan UI
             savedContacts = [];
             renderContactList();
             
-            // Mengirim data hapus satu-per-satu dengan proses tunggu (antre/async await) 
-            // agar mencegah penolakan dari Google Apps Script akibat request bersamaan
             if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
                 for (const id of idsToDelete) {
                     try {
@@ -1043,11 +1074,9 @@
             if (!contactIdToDelete) return;
             const id = contactIdToDelete;
             
-            // Hapus dari UI langsung
             savedContacts = savedContacts.filter(item => item.id != id);
             renderContactList();
             
-            // Kirim ke API
             fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: "delete", id: id })
