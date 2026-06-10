@@ -314,7 +314,6 @@
             box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
         }
 
-        /* === BARU: STYLING TOMBOL HAPUS SEMUA === */
         .btn-delete-all {
             background: #ffebee;
             color: #d32f2f;
@@ -335,7 +334,6 @@
             color: white;
             box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
         }
-        /* ======================================= */
 
         .search-container {
             margin-bottom: 15px;
@@ -569,7 +567,7 @@
                 <label for="nama">Nama Kontak</label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
-                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Farid Ganteng (WA)">
                 </div>
             </div>
 
@@ -671,11 +669,25 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal-overlay" id="deleteSingleModal">
+            <div class="modal-box">
+                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                    <i class="fa-solid fa-user-minus"></i>
+                </div>
+                <h3 class="modal-name">Hapus Kontak</h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus kontak ini dari daftar?</p>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" onclick="closeDeleteSinglePopup()">Batal</button>
+                    <button class="modal-btn modal-btn-danger" onclick="confirmDeleteSingle()">Ya, Hapus</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         // === PENGATURAN PASSWORD & LOGIN ===
-        const APP_PASSWORD = "admin123"; // <-- SILAKAN UBAH PASSWORD DI SINI
+        const APP_PASSWORD = "faridaris28"; // <-- SILAKAN UBAH PASSWORD DI SINI
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedPassword = localStorage.getItem('wa_app_saved_password');
@@ -752,7 +764,7 @@
         };
 
         function loadContactsFromStorage() {
-            if (!API_URL || API_URL === "MASUKKAN_URL_WEB_APP_DI_SINI") {
+            if (!API_URL || API_URL === "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
                 const localData = localStorage.getItem('wa_contacts_premium_v2');
                 if (localData) {
                     savedContacts = JSON.parse(localData);
@@ -808,7 +820,7 @@
             savedContacts.unshift(newContact);
             saveContactsToStorage();
 
-            if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
+            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
                 fetch(API_URL, {
                     method: "POST",
                     body: JSON.stringify({ action: "save", id: newContact.id, name: newContact.name, phone: newContact.phone })
@@ -875,7 +887,7 @@
                     document.getElementById('searchInput').value = ""; 
                     saveContactsToStorage();
                     
-                    if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
+                    if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
                         fetch(API_URL, {
                             method: "POST",
                             body: JSON.stringify({ action: "saveBulk", contacts: importedBatch })
@@ -988,7 +1000,7 @@
             filterContacts();
         }
 
-        // === BARU: FUNGSI UNTUK MENGHAPUS SEMUA KONTAK ===
+        // === FUNGSI MENGHAPUS SEMUA KONTAK ===
         function showDeleteAllPopup() {
             document.getElementById('deleteAllModal').classList.add('active');
         }
@@ -998,15 +1010,11 @@
         }
 
         function confirmDeleteAll() {
-            // Ambil semua ID yang akan dihapus dari Google Sheets sebelum array dikosongkan
             const idsToDelete = savedContacts.map(c => c.id);
-            
-            // Kosongkan array & local storage
             savedContacts = [];
             saveContactsToStorage();
             
-            // Mengirim perintah hapus untuk setiap ID ke Google Sheets agar sinkron
-            if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
+            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
                 idsToDelete.forEach(id => {
                     fetch(API_URL, {
                         method: "POST",
@@ -1017,7 +1025,37 @@
             
             closeDeleteAllPopup();
         }
-        // ===================================================
+        
+        // === BARU: FUNGSI MENGHAPUS SATU KONTAK (MENGGANTIKAN CONFIRM BAWAAN BROWSER) ===
+        let contactIdToDelete = null;
+
+        function deleteContact(id) {
+            contactIdToDelete = id;
+            document.getElementById('deleteSingleModal').classList.add('active');
+        }
+
+        function closeDeleteSinglePopup() {
+            document.getElementById('deleteSingleModal').classList.remove('active');
+            contactIdToDelete = null;
+        }
+
+        function confirmDeleteSingle() {
+            if (!contactIdToDelete) return;
+            const id = contactIdToDelete;
+            
+            savedContacts = savedContacts.filter(item => item.id != id);
+            saveContactsToStorage();
+            
+            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
+                fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "delete", id: id })
+                }).catch(err => console.error(err));
+            }
+            
+            closeDeleteSinglePopup();
+        }
+        // ==============================================================================
 
         function showContactPopup(name, phone) {
             const modal = document.getElementById('contactModal');
@@ -1035,10 +1073,12 @@
             document.getElementById('contactModal').classList.remove('active');
         }
 
+        // Memperbarui penutupan modal saat layar luar di-klik
         window.onclick = function(event) {
             const contactModal = document.getElementById('contactModal');
             const logoutModal = document.getElementById('logoutModal');
             const deleteAllModal = document.getElementById('deleteAllModal');
+            const deleteSingleModal = document.getElementById('deleteSingleModal'); // BARU
             
             if (event.target === contactModal) {
                 closeContactPopup();
@@ -1046,6 +1086,8 @@
                 closeLogoutPopup();
             } else if (event.target === deleteAllModal) {
                 closeDeleteAllPopup();
+            } else if (event.target === deleteSingleModal) {
+                closeDeleteSinglePopup(); // BARU
             }
         }
 
@@ -1087,20 +1129,6 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-        }
-
-        function deleteContact(id) {
-            if (confirm("Apakah Anda yakin ingin menghapus kontak ini dari daftar?")) {
-                savedContacts = savedContacts.filter(item => item.id != id);
-                saveContactsToStorage();
-                
-                if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
-                    fetch(API_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ action: "delete", id: id })
-                    }).catch(err => console.error(err));
-                }
-            }
         }
     </script>
 
