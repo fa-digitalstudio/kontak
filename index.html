@@ -71,6 +71,24 @@
             color: #25D366;
         }
 
+        /* Styling untuk kotak centang password */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #4a4a4a;
+            font-weight: 600;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #25D366;
+        }
+
         .container {
             background: #ffffff;
             width: 100%;
@@ -510,7 +528,7 @@
                 <p>Masukkan kata sandi untuk membuka aplikasi</p>
             </div>
             
-            <div class="form-group" style="margin-bottom: 30px;">
+            <div class="form-group">
                 <label for="appPasswordInput">Password</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-key"></i>
@@ -519,6 +537,11 @@
                         <i class="fa-solid fa-eye" id="togglePwdIcon"></i>
                     </button>
                 </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMeCheck">
+                <label for="rememberMeCheck" style="margin-bottom: 0; cursor: pointer;">Simpan kata sandi di perangkat ini</label>
             </div>
 
             <button class="btn-download" style="width: 100%;" onclick="verifyPassword()">
@@ -670,10 +693,25 @@
         
         let savedContacts = [];
 
+        // Mengecek apakah sebelumnya password disimpan di perangkat
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedPassword = localStorage.getItem('wa_app_saved_password');
+            if (savedPassword === APP_PASSWORD) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainApp').classList.add('active');
+            }
+        });
+
         function verifyPassword() {
             const inputVal = document.getElementById('appPasswordInput').value;
+            const rememberMe = document.getElementById('rememberMeCheck')?.checked;
 
             if (inputVal === APP_PASSWORD) {
+                // Jika dicentang, simpan di localStorage perangkat
+                if (rememberMe) {
+                    localStorage.setItem('wa_app_saved_password', inputVal);
+                }
+
                 document.getElementById('loginOverlay').classList.add('hidden');
                 setTimeout(() => {
                     document.getElementById('mainApp').classList.add('active');
@@ -713,7 +751,13 @@
         }
 
         function confirmLogout() {
+            // Hapus password yang disimpan di perangkat ketika keluar
+            localStorage.removeItem('wa_app_saved_password');
+            
+            // Reset input
             document.getElementById('appPasswordInput').value = '';
+            const rememberMeCheck = document.getElementById('rememberMeCheck');
+            if(rememberMeCheck) rememberMeCheck.checked = false;
             
             closeLogoutPopup();
             document.getElementById('mainApp').classList.remove('active');
