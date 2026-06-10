@@ -97,10 +97,9 @@
             box-shadow: 0 15px 35px rgba(4, 38, 20, 0.08);
             border: 1px solid rgba(0, 0, 0, 0.02);
             margin-bottom: 25px;
-            position: relative; /* Diperlukan untuk tombol absolute di dalamnya */
+            position: relative;
         }
 
-        /* === BARU: STYLING TOMBOL LOGOUT === */
         .btn-logout-main {
             position: absolute;
             top: 20px;
@@ -125,7 +124,6 @@
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
         }
-        /* ================================== */
 
         .header {
             text-align: center;
@@ -157,7 +155,6 @@
             margin-top: 5px;
         }
 
-        /* Form Styling */
         .form-group {
             margin-bottom: 20px;
             position: relative;
@@ -202,7 +199,6 @@
             box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.15);
         }
 
-        /* Grup Tombol Utama */
         .action-container {
             display: flex;
             gap: 12px;
@@ -232,7 +228,6 @@
             box-shadow: 0 12px 25px rgba(37, 211, 102, 0.35);
         }
 
-        /* Tombol Unggah File */
         .btn-upload-file {
             flex: 1;
             background: #f1f5f9;
@@ -269,7 +264,6 @@
             line-height: 1.5;
         }
 
-        /* === STYLING LIST KONTAK === */
         .history-container {
             background: #ffffff;
             width: 100%;
@@ -319,6 +313,29 @@
             background: #004d40;
             box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
         }
+
+        /* === BARU: STYLING TOMBOL HAPUS SEMUA === */
+        .btn-delete-all {
+            background: #ffebee;
+            color: #d32f2f;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete-all:hover {
+            background: #d32f2f;
+            color: white;
+            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
+        }
+        /* ======================================= */
 
         .search-container {
             margin-bottom: 15px;
@@ -494,7 +511,6 @@
         .modal-btn-chat { background: #25D366; color: white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); }
         .modal-btn-chat:hover { background: #1ebd58; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
 
-        /* BARU: Styling Tambahan untuk Tombol Modal Logout */
         .modal-btn-cancel { background: #f1f5f9; color: #475569; }
         .modal-btn-cancel:hover { background: #e2e8f0; }
         .modal-btn-danger { background: #e11d48; color: white; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); }
@@ -587,9 +603,15 @@
                 <div class="history-title">
                     <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
                 </div>
-                <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
-                    <i class="fa-solid fa-file-zipper"></i> Unduh Semua (.vcf)
-                </button>
+                
+                <div style="display: flex; gap: 8px;">
+                    <button id="btnDeleteAll" class="btn-delete-all" onclick="showDeleteAllPopup()" style="display: none;" title="Hapus Seluruh Kontak">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Semua
+                    </button>
+                    <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
+                        <i class="fa-solid fa-file-zipper"></i> Unduh Semua
+                    </button>
+                </div>
             </div>
             
             <div class="search-container" id="searchContainer">
@@ -632,6 +654,20 @@
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeLogoutPopup()">Batal</button>
                     <button class="modal-btn modal-btn-danger" onclick="confirmLogout()">Ya, Keluar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="deleteAllModal">
+            <div class="modal-box">
+                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <h3 class="modal-name">Hapus Semua Kontak</h3>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus <b>SEMUA</b> kontak? Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" onclick="closeDeleteAllPopup()">Batal</button>
+                    <button class="modal-btn modal-btn-danger" onclick="confirmDeleteAll()">Ya, Hapus Semua</button>
                 </div>
             </div>
         </div>
@@ -687,7 +723,6 @@
             }
         }
 
-        // === BARU: FUNGSI UNTUK LOGOUT ===
         function showLogoutPopup() {
             document.getElementById('logoutModal').classList.add('active');
         }
@@ -697,19 +732,14 @@
         }
 
         function confirmLogout() {
-            // Hapus sandi yang disimpan
             localStorage.removeItem('wa_app_saved_password');
-            
-            // Reset input form
             document.getElementById('appPasswordInput').value = '';
             document.getElementById('rememberMeCheck').checked = false;
             
-            // Tutup modal logout dan pindah halaman
             closeLogoutPopup();
             document.getElementById('mainApp').classList.remove('active');
             document.getElementById('loginOverlay').classList.remove('hidden');
         }
-        // ===================================
 
 
         // MASUKKAN URL API / WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
@@ -909,6 +939,7 @@
         function renderContactList() {
             const contactList = document.getElementById('contactList');
             const btnDownloadAll = document.getElementById('btnDownloadAll');
+            const btnDeleteAll = document.getElementById('btnDeleteAll');
             const searchContainer = document.getElementById('searchContainer');
             const counter = document.getElementById('contactCounter');
             
@@ -921,11 +952,13 @@
             if (savedContacts.length === 0) {
                 contactList.innerHTML = `<li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>`;
                 btnDownloadAll.style.display = "none";
+                if(btnDeleteAll) btnDeleteAll.style.display = "none";
                 searchContainer.style.display = "none";
                 return;
             }
 
             btnDownloadAll.style.display = "flex";
+            if(btnDeleteAll) btnDeleteAll.style.display = "flex";
             searchContainer.style.display = "block";
 
             savedContacts.forEach(contact => {
@@ -955,6 +988,37 @@
             filterContacts();
         }
 
+        // === BARU: FUNGSI UNTUK MENGHAPUS SEMUA KONTAK ===
+        function showDeleteAllPopup() {
+            document.getElementById('deleteAllModal').classList.add('active');
+        }
+
+        function closeDeleteAllPopup() {
+            document.getElementById('deleteAllModal').classList.remove('active');
+        }
+
+        function confirmDeleteAll() {
+            // Ambil semua ID yang akan dihapus dari Google Sheets sebelum array dikosongkan
+            const idsToDelete = savedContacts.map(c => c.id);
+            
+            // Kosongkan array & local storage
+            savedContacts = [];
+            saveContactsToStorage();
+            
+            // Mengirim perintah hapus untuk setiap ID ke Google Sheets agar sinkron
+            if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
+                idsToDelete.forEach(id => {
+                    fetch(API_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "delete", id: id })
+                    }).catch(err => console.error(err));
+                });
+            }
+            
+            closeDeleteAllPopup();
+        }
+        // ===================================================
+
         function showContactPopup(name, phone) {
             const modal = document.getElementById('contactModal');
             document.getElementById('modalName').textContent = name;
@@ -971,15 +1035,17 @@
             document.getElementById('contactModal').classList.remove('active');
         }
 
-        // BARU: Perbaikan event global window.onclick untuk menutup semua jenis modal
         window.onclick = function(event) {
             const contactModal = document.getElementById('contactModal');
             const logoutModal = document.getElementById('logoutModal');
+            const deleteAllModal = document.getElementById('deleteAllModal');
             
             if (event.target === contactModal) {
                 closeContactPopup();
             } else if (event.target === logoutModal) {
                 closeLogoutPopup();
+            } else if (event.target === deleteAllModal) {
+                closeDeleteAllPopup();
             }
         }
 
