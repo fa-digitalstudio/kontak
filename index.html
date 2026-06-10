@@ -368,7 +368,7 @@
     <div class="history-container">
         <div class="history-header">
             <div class="history-title">
-                <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan
+                <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
             </div>
             <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
                 <i class="fa-solid fa-file-zipper"></i> Unduh Semua (.vcf)
@@ -549,6 +549,7 @@
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             const items = document.querySelectorAll('.contact-item');
             let hasResults = false;
+            let visibleCount = 0;
 
             // Hapus pesan "tidak ditemukan" yang lama jika ada
             const oldNoResult = document.getElementById('noSearchResult');
@@ -562,10 +563,21 @@
                 if (nameText.includes(keyword) || phoneText.includes(keyword)) {
                     item.style.display = 'flex';
                     hasResults = true;
+                    visibleCount++;
                 } else {
                     item.style.display = 'none';
                 }
             });
+
+            // Update badge angka counter real-time sesuai hasil pencarian
+            const counter = document.getElementById('contactCounter');
+            if (counter) {
+                if (keyword !== "") {
+                    counter.textContent = `(${visibleCount} ditemukan)`;
+                } else {
+                    counter.textContent = `(${savedContacts.length})`;
+                }
+            }
 
             // Tampilkan pesan jika tidak ada kontak yang cocok dengan keyword
             if (!hasResults && savedContacts.length > 0) {
@@ -582,8 +594,13 @@
             const contactList = document.getElementById('contactList');
             const btnDownloadAll = document.getElementById('btnDownloadAll');
             const searchContainer = document.getElementById('searchContainer');
+            const counter = document.getElementById('contactCounter');
             
             contactList.innerHTML = "";
+
+            if (counter) {
+                counter.textContent = `(${savedContacts.length})`;
+            }
 
             if (savedContacts.length === 0) {
                 contactList.innerHTML = `<li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>`;
