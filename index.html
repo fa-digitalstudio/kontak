@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator & Penyimpan Kontak WA</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2f1 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 35px 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(4, 38, 20, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            margin-bottom: 25px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header .icon-box {
+            width: 65px;
+            height: 65px;
+            background: #e8f5e9;
+            color: #25D366;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 18px;
+            margin: 0 auto 15px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: #888;
+            font-size: 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            font-size: 15px;
+            color: #222;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            border-color: #25D366;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.15);
+        }
+
+        /* Grup Tombol Utama */
+        .action-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-download {
+            flex: 2;
+            background: linear-gradient(135deg, #25D366, #1ebd58);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(37, 211, 102, 0.35);
+        }
+
+        /* Tombol Unggah File */
+        .btn-upload-file {
+            flex: 1;
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-upload-file:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .note {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        /* === STYLING LIST KONTAK === */
+        .history-container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(4, 38, 20, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .history-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-title i { color: #25D366; }
+
+        .btn-download-all {
+            background: #00796b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-all:hover {
+            background: #004d40;
+            box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
+        }
+
+        /* === BARU: Styling Kotak Pencarian === */
+        .search-container {
+            margin-bottom: 15px;
+            display: none; /* Diatur via JS, muncul hanya jika ada kontak */
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .search-control {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #334155;
+            outline: none;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .search-control:focus {
+            border-color: #00796b;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+        }
+
+        .contact-list {
+            list-style: none;
+            max-height: 290px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .contact-list::-webkit-scrollbar { width: 5px; }
+        .contact-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .contact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #edf2f7;
+            transition: all 0.2s ease;
+        }
+
+        .contact-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .contact-name-text { font-size: 14px; font-weight: 600; color: #1e293b; word-break: break-word; }
+        .contact-phone-text { font-size: 12px; color: #64748b; }
+
+        .action-group { display: flex; gap: 6px; }
+
+        .action-list-btn {
+            text-decoration: none; padding: 8px 10px; border-radius: 8px;
+            font-size: 12px; font-weight: 600; display: flex; align-items: center;
+            justify-content: center; border: none; cursor: pointer; transition: all 0.2s ease;
+        }
+
+        .btn-list-dl { background: #e0f2f1; color: #00796b; }
+        .btn-list-dl:hover { background: #00796b; color: white; }
+
+        .btn-list-wa { background: #e8f5e9; color: #25D366; }
+        .btn-list-wa:hover { background: #25D366; color: white; }
+
+        .btn-list-del { background: #ffebee; color: #d32f2f; }
+        .btn-list-del:hover { background: #d32f2f; color: white; }
+
+        .empty-state { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Kotak Form Utama -->
+    <div class="container">
+        <div class="header">
+            <div class="icon-box">
+                <i class="fa-solid fa-address-book"></i>
+            </div>
+            <h1>Simpan & Unggah Kontak</h1>
+            <p>Ketik kontak baru atau unggah file .vcf cadangan</p>
+        </div>
+
+        <div class="form-group">
+            <label for="nama">Nama Kontak</label>
+            <div class="input-wrapper">
+                <i class="fa-regular fa-user"></i>
+                <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="nomor">Nomor WhatsApp / HP</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="nomor" class="form-control" placeholder="Contoh: 08123456789">
+            </div>
+        </div>
+
+        <div class="action-container">
+            <button class="btn-download" onclick="processNewContact()">
+                <i class="fa-solid fa-download"></i> Simpan
+            </button>
+            
+            <label class="btn-upload-file" for="fileInput">
+                <i class="fa-solid fa-file-import" style="font-size: 18px; color: #00796b;"></i>
+                <span>Upload VCF</span>
+            </label>
+            <input type="file" id="fileInput" accept=".vcf" onchange="handleVcfUpload(event)">
+        </div>
+
+        <p class="note">
+            <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di browser perangkat Anda.
+        </p>
+    </div>
+
+    <!-- Kotak Riwayat List Kontak -->
+    <div class="history-container">
+        <div class="history-header">
+            <div class="history-title">
+                <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan
+            </div>
+            <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
+                <i class="fa-solid fa-file-zipper"></i> Unduh Semua (.vcf)
+            </button>
+        </div>
+        
+        <!-- BARU: Input Pencarian Real-time -->
+        <div class="search-container" id="searchContainer">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" class="search-control" placeholder="Cari nama atau nomor kontak..." oninput="filterContacts()">
+            </div>
+        </div>
+        
+        <ul id="contactList" class="contact-list">
+            <li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>
+        </ul>
+    </div>
+
+    <!-- Script Logic -->
+    <script>
+        let savedContacts = [];
+
+        window.onload = function() {
+            loadContactsFromStorage();
+        };
+
+        function loadContactsFromStorage() {
+            const localData = localStorage.getItem('wa_contacts_premium_v2');
+            if (localData) {
+                savedContacts = JSON.parse(localData);
+                renderContactList();
+            }
+        }
+
+        function saveContactsToStorage() {
+            localStorage.setItem('wa_contacts_premium_v2', JSON.stringify(savedContacts));
+            renderContactList();
+        }
+
+        function processNewContact() {
+            const namaInput = document.getElementById('nama');
+            const nomorInput = document.getElementById('nomor');
+            
+            const nama = namaInput.value.trim();
+            let nomor = nomorInput.value.trim();
+
+            if (nama === "" || nomor === "") {
+                alert("Harap isi Nama dan Nomor terlebih dahulu!");
+                return;
+            }
+
+            if (nomor.startsWith('0')) {
+                nomor = '62' + nomor.slice(1);
+            } else if (nomor.startsWith('+')) {
+                nomor = nomor.replace('+', '');
+            }
+
+            downloadSingleVCF(nama, nomor);
+
+            const newContact = {
+                id: Date.now() + Math.random(),
+                name: nama,
+                phone: nomor
+            };
+            savedContacts.unshift(newContact);
+            saveContactsToStorage();
+
+            // Reset pencarian jika ada text agar kontak baru langsung terlihat
+            document.getElementById('searchInput').value = "";
+
+            namaInput.value = "";
+            nomorInput.value = "";
+        }
+
+        function handleVcfUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const vcardRegex = /BEGIN:VCARD[\s\S]*?END:VCARD/g;
+                const matches = text.match(vcardRegex);
+
+                if (!matches || matches.length === 0) {
+                    alert("Format file .vcf tidak valid atau tidak terbaca!");
+                    return;
+                }
+
+                let importedCount = 0;
+
+                matches.forEach(vcard => {
+                    let nameMatch = vcard.match(/FN:(.*)/);
+                    if (!nameMatch) nameMatch = vcard.match(/N:(.*)/);
+                    
+                    let telMatch = vcard.match(/TEL;.*:(.*)/);
+                    if (!telMatch) telMatch = vcard.match(/TEL:(.*)/);
+
+                    if (nameMatch && telMatch) {
+                        let name = nameMatch[1].trim().replace(/;/g, ' ');
+                        let phone = telMatch[1].trim().replace(/[^0-9+]/g, '');
+
+                        if (phone.startsWith('0')) {
+                            phone = '62' + phone.slice(1);
+                        } else if (phone.startsWith('+')) {
+                            phone = phone.replace('+', '');
+                        }
+
+                        const isDuplicate = savedContacts.some(c => c.phone === phone);
+                        
+                        if (!isDuplicate && name && phone) {
+                            savedContacts.push({
+                                id: Date.now() + Math.random(),
+                                name: name,
+                                phone: phone
+                            });
+                            importedCount++;
+                        }
+                    }
+                });
+
+                if (importedCount > 0) {
+                    document.getElementById('searchInput').value = ""; // Reset form pencarian
+                    saveContactsToStorage();
+                    alert(`Berhasil mengimpor ${importedCount} kontak baru ke dalam daftar!`);
+                } else {
+                    alert("Tidak ada kontak baru yang ditambahkan (mungkin nomor sudah terdaftar semua).");
+                }
+                
+                event.target.value = "";
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // FITUR BARU: Fungsi untuk memfilter list berdasarkan input pencarian
+        function filterContacts() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const items = document.querySelectorAll('.contact-item');
+            let hasResults = false;
+
+            // Hapus pesan "tidak ditemukan" yang lama jika ada
+            const oldNoResult = document.getElementById('noSearchResult');
+            if (oldNoResult) oldNoResult.remove();
+
+            items.forEach(item => {
+                const nameText = item.querySelector('.contact-name-text').textContent.toLowerCase();
+                const phoneText = item.querySelector('.contact-phone-text').textContent.toLowerCase();
+
+                // COCOKKAN NAMA ATAU NOMOR TELEPON
+                if (nameText.includes(keyword) || phoneText.includes(keyword)) {
+                    item.style.display = 'flex';
+                    hasResults = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada kontak yang cocok dengan keyword
+            if (!hasResults && savedContacts.length > 0) {
+                const contactList = document.getElementById('contactList');
+                const li = document.createElement('li');
+                li.id = 'noSearchResult';
+                li.className = 'empty-state';
+                li.textContent = 'Kontak tidak ditemukan.';
+                contactList.appendChild(li);
+            }
+        }
+
+        function renderContactList() {
+            const contactList = document.getElementById('contactList');
+            const btnDownloadAll = document.getElementById('btnDownloadAll');
+            const searchContainer = document.getElementById('searchContainer');
+            
+            contactList.innerHTML = "";
+
+            if (savedContacts.length === 0) {
+                contactList.innerHTML = `<li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>`;
+                btnDownloadAll.style.display = "none";
+                searchContainer.style.display = "none"; // Sembunyikan kolom pencarian jika database kosong
+                return;
+            }
+
+            btnDownloadAll.style.display = "flex";
+            searchContainer.style.display = "block"; // Munculkan kolom pencarian jika ada minimal 1 kontak
+
+            savedContacts.forEach(contact => {
+                const li = document.createElement('li');
+                li.className = 'contact-item';
+                li.innerHTML = `
+                    <div class="contact-info">
+                        <span class="contact-name-text">${contact.name}</span>
+                        <span class="contact-phone-text">+${contact.phone}</span>
+                    </div>
+                    <div class="action-group">
+                        <button class="action-list-btn btn-list-dl" onclick="downloadSingleVCF('${contact.name}', '${contact.phone}')" title="Download VCF">
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                        </button>
+                        <a href="https://wa.me/${contact.phone}" target="_blank" class="action-list-btn btn-list-wa" title="Chat WA">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </a>
+                        <button class="action-list-btn btn-list-del" onclick="deleteContact(${contact.id})" title="Hapus Kontak">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                contactList.appendChild(li);
+            });
+
+            // Jalankan filter ulang jika user sedang mengetik saat merender (misal sehabis hapus data)
+            filterContacts();
+        }
+
+        function downloadSingleVCF(name, phone) {
+            const vcardStr = 
+                "BEGIN:VCARD\n" +
+                "VERSION:3.0\n" +
+                "FN:" + name + "\n" +
+                "TEL;TYPE=CELL,VOICE:" + phone + "\n" +
+                "NOTE:Disimpan dari WA Generator\n" +
+                "END:VCARD";
+
+            triggerDownload(vcardStr, name.replace(/[^a-zA-Z0-9]/g, "_") + ".vcf");
+        }
+
+        function downloadAllContacts() {
+            if (savedContacts.length === 0) return;
+
+            let bulkVcardStr = "";
+            savedContacts.forEach(contact => {
+                bulkVcardStr += 
+                    "BEGIN:VCARD\n" +
+                    "VERSION:3.0\n" +
+                    "FN:" + contact.name + "\n" +
+                    "TEL;TYPE=CELL,VOICE:" + contact.phone + "\n" +
+                    "NOTE:Disimpan Masal via WA Generator\n" +
+                    "END:VCARD\n";
+            });
+
+            triggerDownload(bulkVcardStr, "Semua_Kontak_WhatsApp.vcf");
+        }
+
+        function triggerDownload(textData, fileName) {
+            const blob = new Blob([textData], { type: "text/vcard;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function deleteContact(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus kontak ini dari daftar?")) {
+                savedContacts = savedContacts.filter(item => item.id !== id);
+                saveContactsToStorage();
+            }
+        }
+    </script>
+
+</body>
+</html>
