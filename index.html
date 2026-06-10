@@ -56,23 +56,6 @@
             display: flex;
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #4a4a4a;
-            font-weight: 600;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: #25D366;
-        }
-
         .toggle-pwd-btn {
             position: absolute;
             right: 16px;
@@ -527,7 +510,7 @@
                 <p>Masukkan kata sandi untuk membuka aplikasi</p>
             </div>
             
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 30px;">
                 <label for="appPasswordInput">Password</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-key"></i>
@@ -536,11 +519,6 @@
                         <i class="fa-solid fa-eye" id="togglePwdIcon"></i>
                     </button>
                 </div>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="rememberMeCheck">
-                <label for="rememberMeCheck" style="margin-bottom: 0; cursor: pointer;">Simpan kata sandi di perangkat ini</label>
             </div>
 
             <button class="btn-download" style="width: 100%;" onclick="verifyPassword()">
@@ -567,7 +545,7 @@
                 <label for="nama">Nama Kontak</label>
                 <div class="input-wrapper">
                     <i class="fa-regular fa-user"></i>
-                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Farid Ganteng (WA)">
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
                 </div>
             </div>
 
@@ -592,14 +570,14 @@
             </div>
 
             <p class="note">
-                <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di browser perangkat Anda.
+                <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data sinkron dengan Database Google Sheets.
             </p>
         </div>
 
         <div class="history-container">
             <div class="history-header">
                 <div class="history-title">
-                    <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
+                    <i class="fa-solid fa-list-ul"></i> Database Kontak <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
                 </div>
                 
                 <div style="display: flex; gap: 8px;">
@@ -620,7 +598,7 @@
             </div>
             
             <ul id="contactList" class="contact-list">
-                <li class="empty-state" id="emptyState">Memuat data dari Google Sheets...</li>
+                <li class="empty-state" id="emptyState">Memuat data dari server...</li>
             </ul>
         </div>
 
@@ -648,7 +626,7 @@
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </div>
                 <h3 class="modal-name">Konfirmasi Keluar</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin keluar dari aplikasi? Sandi Anda yang tersimpan akan dihapus.</p>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin keluar dari aplikasi?</p>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeLogoutPopup()">Batal</button>
                     <button class="modal-btn modal-btn-danger" onclick="confirmLogout()">Ya, Keluar</button>
@@ -686,25 +664,16 @@
     </div>
 
     <script>
-        // === PENGATURAN PASSWORD & LOGIN ===
-        const APP_PASSWORD = "faridaris28"; // <-- SILAKAN UBAH PASSWORD DI SINI
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedPassword = localStorage.getItem('wa_app_saved_password');
-            if (savedPassword === APP_PASSWORD) {
-                document.getElementById('loginOverlay').classList.add('hidden');
-                document.getElementById('mainApp').classList.add('active');
-            }
-        });
+        // === PENGATURAN PASSWORD & API KEY ===
+        const APP_PASSWORD = "admin123"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
+        
+        let savedContacts = [];
 
         function verifyPassword() {
             const inputVal = document.getElementById('appPasswordInput').value;
-            const rememberMe = document.getElementById('rememberMeCheck').checked;
 
             if (inputVal === APP_PASSWORD) {
-                if (rememberMe) {
-                    localStorage.setItem('wa_app_saved_password', inputVal);
-                }
                 document.getElementById('loginOverlay').classList.add('hidden');
                 setTimeout(() => {
                     document.getElementById('mainApp').classList.add('active');
@@ -744,9 +713,7 @@
         }
 
         function confirmLogout() {
-            localStorage.removeItem('wa_app_saved_password');
             document.getElementById('appPasswordInput').value = '';
-            document.getElementById('rememberMeCheck').checked = false;
             
             closeLogoutPopup();
             document.getElementById('mainApp').classList.remove('active');
@@ -754,25 +721,11 @@
         }
 
 
-        // MASUKKAN URL API / WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
-        const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
-
-        let savedContacts = [];
-
         window.onload = function() {
-            loadContactsFromStorage();
+            loadContactsFromAPI();
         };
 
-        function loadContactsFromStorage() {
-            if (!API_URL || API_URL === "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
-                const localData = localStorage.getItem('wa_contacts_premium_v2');
-                if (localData) {
-                    savedContacts = JSON.parse(localData);
-                    renderContactList();
-                }
-                return;
-            }
-
+        function loadContactsFromAPI() {
             fetch(API_URL + "?action=load")
                 .then(res => res.json())
                 .then(data => {
@@ -780,18 +733,9 @@
                     renderContactList();
                 })
                 .catch(err => {
-                    console.error("Gagal memuat dari Sheets, beralih ke LocalStorage", err);
-                    const localData = localStorage.getItem('wa_contacts_premium_v2');
-                    if (localData) {
-                        savedContacts = JSON.parse(localData);
-                        renderContactList();
-                    }
+                    console.error("Gagal memuat dari Sheets", err);
+                    alert("Gagal terhubung ke database. Coba muat ulang halaman.");
                 });
-        }
-
-        function saveContactsToStorage() {
-            localStorage.setItem('wa_contacts_premium_v2', JSON.stringify(savedContacts));
-            renderContactList();
         }
 
         function processNewContact() {
@@ -817,18 +761,18 @@
                 name: nama,
                 phone: nomor
             };
+            
+            // Simpan ke memory dan update UI langsung
             savedContacts.unshift(newContact);
-            saveContactsToStorage();
+            renderContactList();
 
-            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
-                fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "save", id: newContact.id, name: newContact.name, phone: newContact.phone })
-                }).catch(err => console.error(err));
-            }
+            // Simpan ke API
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "save", id: newContact.id, name: newContact.name, phone: newContact.phone })
+            }).catch(err => console.error(err));
 
             document.getElementById('searchInput').value = "";
-
             namaInput.value = "";
             nomorInput.value = "";
         }
@@ -885,18 +829,15 @@
 
                 if (importedCount > 0) {
                     document.getElementById('searchInput').value = ""; 
-                    saveContactsToStorage();
+                    renderContactList();
                     
-                    if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
-                        fetch(API_URL, {
-                            method: "POST",
-                            body: JSON.stringify({ action: "saveBulk", contacts: importedBatch })
-                        })
-                        .then(() => alert(`Berhasil mengimpor ${importedCount} kontak baru ke daftar & Google Sheets!`))
-                        .catch(err => console.error(err));
-                    } else {
-                        alert(`Berhasil mengimpor ${importedCount} kontak baru ke dalam daftar!`);
-                    }
+                    fetch(API_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "saveBulk", contacts: importedBatch })
+                    })
+                    .then(() => alert(`Berhasil mengimpor ${importedCount} kontak baru ke daftar & Google Sheets!`))
+                    .catch(err => console.error(err));
+                    
                 } else {
                     alert("Tidak ada kontak baru yang ditambahkan (mungkin nomor sudah terdaftar semua).");
                 }
@@ -1000,7 +941,6 @@
             filterContacts();
         }
 
-        // === FUNGSI MENGHAPUS SEMUA KONTAK ===
         function showDeleteAllPopup() {
             document.getElementById('deleteAllModal').classList.add('active');
         }
@@ -1011,22 +951,22 @@
 
         function confirmDeleteAll() {
             const idsToDelete = savedContacts.map(c => c.id);
-            savedContacts = [];
-            saveContactsToStorage();
             
-            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
-                idsToDelete.forEach(id => {
-                    fetch(API_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ action: "delete", id: id })
-                    }).catch(err => console.error(err));
-                });
-            }
+            // Kosongkan dari UI langsung
+            savedContacts = [];
+            renderContactList();
+            
+            // Kirim penghapusan API
+            idsToDelete.forEach(id => {
+                fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "delete", id: id })
+                }).catch(err => console.error(err));
+            });
             
             closeDeleteAllPopup();
         }
         
-        // === BARU: FUNGSI MENGHAPUS SATU KONTAK (MENGGANTIKAN CONFIRM BAWAAN BROWSER) ===
         let contactIdToDelete = null;
 
         function deleteContact(id) {
@@ -1043,19 +983,18 @@
             if (!contactIdToDelete) return;
             const id = contactIdToDelete;
             
+            // Hapus dari UI langsung
             savedContacts = savedContacts.filter(item => item.id != id);
-            saveContactsToStorage();
+            renderContactList();
             
-            if (API_URL && API_URL !== "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec") {
-                fetch(API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "delete", id: id })
-                }).catch(err => console.error(err));
-            }
+            // Kirim ke API
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "delete", id: id })
+            }).catch(err => console.error(err));
             
             closeDeleteSinglePopup();
         }
-        // ==============================================================================
 
         function showContactPopup(name, phone) {
             const modal = document.getElementById('contactModal');
@@ -1073,12 +1012,11 @@
             document.getElementById('contactModal').classList.remove('active');
         }
 
-        // Memperbarui penutupan modal saat layar luar di-klik
         window.onclick = function(event) {
             const contactModal = document.getElementById('contactModal');
             const logoutModal = document.getElementById('logoutModal');
             const deleteAllModal = document.getElementById('deleteAllModal');
-            const deleteSingleModal = document.getElementById('deleteSingleModal'); // BARU
+            const deleteSingleModal = document.getElementById('deleteSingleModal'); 
             
             if (event.target === contactModal) {
                 closeContactPopup();
@@ -1087,7 +1025,7 @@
             } else if (event.target === deleteAllModal) {
                 closeDeleteAllPopup();
             } else if (event.target === deleteSingleModal) {
-                closeDeleteSinglePopup(); // BARU
+                closeDeleteSinglePopup(); 
             }
         }
 
