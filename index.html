@@ -25,6 +25,70 @@
             padding: 40px 20px;
         }
 
+        /* === BARU: STYLING HALAMAN LOGIN === */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #e0f2f1 0%, #e8f5e9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: all 0.4s ease;
+            padding: 20px;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: scale(1.05);
+        }
+
+        .main-app {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-app.active {
+            display: flex;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #4a4a4a;
+            font-weight: 600;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #25D366;
+        }
+
+        .toggle-pwd-btn {
+            position: absolute;
+            right: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #888;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .toggle-pwd-btn:hover {
+            color: #25D366;
+        }
+        /* ================================== */
+
         .container {
             background: #ffffff;
             width: 100%;
@@ -86,7 +150,7 @@
             align-items: center;
         }
 
-        .input-wrapper i {
+        .input-wrapper i.fa-user, .input-wrapper i.fa-phone, .input-wrapper i.fa-key {
             position: absolute;
             left: 16px;
             color: #888;
@@ -295,7 +359,7 @@
             gap: 2px;
             flex-grow: 1;
             margin-right: 10px;
-            cursor: pointer; /* Baru: Menandakan bisa diklik */
+            cursor: pointer; 
         }
         
         .contact-info:hover .contact-name-text {
@@ -324,7 +388,7 @@
 
         .empty-state { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
 
-        /* === BARU: STYLING POPUP MODAL === */
+        /* === STYLING POPUP MODAL === */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -406,90 +470,177 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div class="icon-box">
-                <i class="fa-solid fa-address-book"></i>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="container" style="margin-bottom: 0;">
+            <div class="header">
+                <div class="icon-box">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h1>Akses Keamanan</h1>
+                <p>Masukkan kata sandi untuk membuka aplikasi</p>
             </div>
-            <h1>Simpan & Unggah Kontak</h1>
-            <p>Ketik kontak baru atau unggah file .vcf cadangan</p>
-        </div>
-
-        <div class="form-group">
-            <label for="nama">Nama Kontak</label>
-            <div class="input-wrapper">
-                <i class="fa-regular fa-user"></i>
-                <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="nomor">Nomor WhatsApp / HP</label>
-            <div class="input-wrapper">
-                <i class="fa-solid fa-phone"></i>
-                <input type="tel" id="nomor" class="form-control" placeholder="Contoh: 08123456789">
-            </div>
-        </div>
-
-        <div class="action-container">
-            <button class="btn-download" onclick="processNewContact()">
-                <i class="fa-solid fa-download"></i> Simpan
-            </button>
             
-            <label class="btn-upload-file" for="fileInput">
-                <i class="fa-solid fa-file-import" style="font-size: 18px; color: #00796b;"></i>
-                <span>Upload VCF</span>
-            </label>
-            <input type="file" id="fileInput" accept=".vcf" onchange="handleVcfUpload(event)">
-        </div>
-
-        <p class="note">
-            <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di browser perangkat Anda.
-        </p>
-    </div>
-
-    <div class="history-container">
-        <div class="history-header">
-            <div class="history-title">
-                <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
+            <div class="form-group">
+                <label for="appPasswordInput">Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="appPasswordInput" class="form-control" placeholder="Masukkan sandi..." onkeypress="handleEnter(event)">
+                    <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()">
+                        <i class="fa-solid fa-eye" id="togglePwdIcon"></i>
+                    </button>
+                </div>
             </div>
-            <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
-                <i class="fa-solid fa-file-zipper"></i> Unduh Semua (.vcf)
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="rememberMeCheck">
+                <label for="rememberMeCheck" style="margin-bottom: 0; cursor: pointer;">Simpan kata sandi di perangkat ini</label>
+            </div>
+
+            <button class="btn-download" style="width: 100%;" onclick="verifyPassword()">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
             </button>
         </div>
-        
-        <div class="search-container" id="searchContainer">
-            <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-control" placeholder="Cari nama atau nomor kontak..." oninput="filterContacts()">
-            </div>
-        </div>
-        
-        <ul id="contactList" class="contact-list">
-            <li class="empty-state" id="emptyState">Memuat data dari Google Sheets...</li>
-        </ul>
     </div>
 
-    <!-- BARU: ELEMEN POPUP MODAL -->
-    <div class="modal-overlay" id="contactModal">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeContactPopup()"><i class="fa-solid fa-xmark"></i></button>
-            <div class="modal-avatar">
-                <img id="modalImg" src="" alt="Profile">
+    <div id="mainApp" class="main-app">
+        <div class="container">
+            <div class="header">
+                <div class="icon-box">
+                    <i class="fa-solid fa-address-book"></i>
+                </div>
+                <h1>Simpan & Unggah Kontak</h1>
+                <p>Ketik kontak baru atau unggah file .vcf cadangan</p>
             </div>
-            <h3 class="modal-name" id="modalName">-</h3>
-            <div class="modal-phone">
-                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> <span id="modalPhone">-</span>
+
+            <div class="form-group">
+                <label for="nama">Nama Kontak</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="nama" class="form-control" placeholder="Contoh: Budi Jatmiko (WA)">
+                </div>
             </div>
-            <div class="modal-actions">
-                <a href="#" id="modalChatBtn" target="_blank" class="modal-btn modal-btn-chat">
-                    <i class="fa-brands fa-whatsapp"></i> Chat via WA
-                </a>
+
+            <div class="form-group">
+                <label for="nomor">Nomor WhatsApp / HP</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="nomor" class="form-control" placeholder="Contoh: 08123456789">
+                </div>
+            </div>
+
+            <div class="action-container">
+                <button class="btn-download" onclick="processNewContact()">
+                    <i class="fa-solid fa-download"></i> Simpan
+                </button>
+                
+                <label class="btn-upload-file" for="fileInput">
+                    <i class="fa-solid fa-file-import" style="font-size: 18px; color: #00796b;"></i>
+                    <span>Upload VCF</span>
+                </label>
+                <input type="file" id="fileInput" accept=".vcf" onchange="handleVcfUpload(event)">
+            </div>
+
+            <p class="note">
+                <i class="fa-solid fa-circle-info"></i> File yang diunduh/diunggah berformat <b>.vcf</b>.<br>Data otomatis tersimpan di browser perangkat Anda.
+            </p>
+        </div>
+
+        <div class="history-container">
+            <div class="history-header">
+                <div class="history-title">
+                    <i class="fa-solid fa-list-ul"></i> Database Kontak Tersimpan <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
+                </div>
+                <button id="btnDownloadAll" class="btn-download-all" onclick="downloadAllContacts()" style="display: none;">
+                    <i class="fa-solid fa-file-zipper"></i> Unduh Semua (.vcf)
+                </button>
+            </div>
+            
+            <div class="search-container" id="searchContainer">
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-control" placeholder="Cari nama atau nomor kontak..." oninput="filterContacts()">
+                </div>
+            </div>
+            
+            <ul id="contactList" class="contact-list">
+                <li class="empty-state" id="emptyState">Memuat data dari Google Sheets...</li>
+            </ul>
+        </div>
+
+        <div class="modal-overlay" id="contactModal">
+            <div class="modal-box">
+                <button class="modal-close" onclick="closeContactPopup()"><i class="fa-solid fa-xmark"></i></button>
+                <div class="modal-avatar">
+                    <img id="modalImg" src="" alt="Profile">
+                </div>
+                <h3 class="modal-name" id="modalName">-</h3>
+                <div class="modal-phone">
+                    <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> <span id="modalPhone">-</span>
+                </div>
+                <div class="modal-actions">
+                    <a href="#" id="modalChatBtn" target="_blank" class="modal-btn modal-btn-chat">
+                        <i class="fa-brands fa-whatsapp"></i> Chat via WA
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // === PENGATURAN PASSWORD & LOGIN ===
+        const APP_PASSWORD = "admin123"; // <-- SILAKAN UBAH PASSWORD DI SINI
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cek apakah user pernah centang "Simpan sandi di perangkat"
+            const savedPassword = localStorage.getItem('wa_app_saved_password');
+            if (savedPassword === APP_PASSWORD) {
+                // Jika cocok, langsung masuk ke app
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainApp').classList.add('active');
+            }
+        });
+
+        function verifyPassword() {
+            const inputVal = document.getElementById('appPasswordInput').value;
+            const rememberMe = document.getElementById('rememberMeCheck').checked;
+
+            if (inputVal === APP_PASSWORD) {
+                if (rememberMe) {
+                    localStorage.setItem('wa_app_saved_password', inputVal);
+                }
+                // Sembunyikan form login dengan efek transisi, munculkan app utama
+                document.getElementById('loginOverlay').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('mainApp').classList.add('active');
+                }, 200); // Menunggu transisi login overlay selesai sebentar
+            } else {
+                alert("Password yang Anda masukkan salah!");
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                verifyPassword();
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const inputField = document.getElementById('appPasswordInput');
+            const icon = document.getElementById('togglePwdIcon');
+            
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                inputField.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        // ===================================
+
+
         // MASUKKAN URL API / WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
 
@@ -707,11 +858,9 @@
             searchContainer.style.display = "block";
 
             savedContacts.forEach(contact => {
-                // Escape kutip untuk meminimalisir error onClick
                 const safeName = contact.name.replace(/'/g, "\\'"); 
                 const li = document.createElement('li');
                 li.className = 'contact-item';
-                // BARU: Menambahkan onClick pada div .contact-info untuk memanggil showContactPopup()
                 li.innerHTML = `
                     <div class="contact-info" onclick="showContactPopup('${safeName}', '${contact.phone}')" title="Lihat Profil">
                         <span class="contact-name-text">${contact.name}</span>
@@ -735,14 +884,12 @@
             filterContacts();
         }
 
-        // === BARU: FUNGSI UNTUK MENAMPILKAN DAN MENUTUP POPUP MODAL ===
         function showContactPopup(name, phone) {
             const modal = document.getElementById('contactModal');
             document.getElementById('modalName').textContent = name;
             document.getElementById('modalPhone').textContent = '+' + phone;
             document.getElementById('modalChatBtn').href = 'https://wa.me/' + phone;
             
-            // Membuat URL Gambar Avatar menggunakan layanan UI Avatars API (otomatis inisial nama)
             const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=e8f5e9&color=25D366&size=150&bold=true&rounded=true`;
             document.getElementById('modalImg').src = avatarUrl;
             
@@ -753,14 +900,12 @@
             document.getElementById('contactModal').classList.remove('active');
         }
 
-        // Menutup popup saat klik di area abu-abu (luar modal)
         window.onclick = function(event) {
             const modal = document.getElementById('contactModal');
             if (event.target === modal) {
                 closeContactPopup();
             }
         }
-        // =============================================================
 
         function downloadSingleVCF(name, phone) {
             const vcardStr = 
