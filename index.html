@@ -229,10 +229,9 @@
             box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
         }
 
-        /* === BARU: Styling Kotak Pencarian === */
         .search-container {
             margin-bottom: 15px;
-            display: none; /* Diatur via JS, muncul hanya jika ada kontak */
+            display: none; 
         }
 
         .search-wrapper {
@@ -296,9 +295,14 @@
             gap: 2px;
             flex-grow: 1;
             margin-right: 10px;
+            cursor: pointer; /* Baru: Menandakan bisa diklik */
+        }
+        
+        .contact-info:hover .contact-name-text {
+            color: #00796b;
         }
 
-        .contact-name-text { font-size: 14px; font-weight: 600; color: #1e293b; word-break: break-word; }
+        .contact-name-text { font-size: 14px; font-weight: 600; color: #1e293b; word-break: break-word; transition: color 0.2s ease; }
         .contact-phone-text { font-size: 12px; color: #64748b; }
 
         .action-group { display: flex; gap: 6px; }
@@ -319,6 +323,85 @@
         .btn-list-del:hover { background: #d32f2f; color: white; }
 
         .empty-state { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
+
+        /* === BARU: STYLING POPUP MODAL === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            width: 90%;
+            max-width: 320px;
+            border-radius: 24px;
+            padding: 30px 20px 25px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            color: #64748b;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .modal-close:hover { background: #e2e8f0; color: #1e293b; }
+
+        .modal-avatar {
+            width: 85px; height: 85px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 3px solid #25D366;
+            padding: 3px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.15);
+        }
+
+        .modal-avatar img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .modal-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px; word-break: break-word;}
+        .modal-phone { font-size: 15px; color: #64748b; margin-bottom: 22px; display: flex; justify-content: center; align-items: center; gap: 6px; font-weight: 500;}
+        
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn {
+            padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; flex: 1; justify-content: center; transition: all 0.2s ease;
+        }
+        .modal-btn-chat { background: #25D366; color: white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); }
+        .modal-btn-chat:hover { background: #1ebd58; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
     </style>
 </head>
 <body>
@@ -387,6 +470,25 @@
         </ul>
     </div>
 
+    <!-- BARU: ELEMEN POPUP MODAL -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeContactPopup()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-avatar">
+                <img id="modalImg" src="" alt="Profile">
+            </div>
+            <h3 class="modal-name" id="modalName">-</h3>
+            <div class="modal-phone">
+                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> <span id="modalPhone">-</span>
+            </div>
+            <div class="modal-actions">
+                <a href="#" id="modalChatBtn" target="_blank" class="modal-btn modal-btn-chat">
+                    <i class="fa-brands fa-whatsapp"></i> Chat via WA
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
         // MASUKKAN URL API / WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
@@ -446,8 +548,6 @@
                 nomor = nomor.replace('+', '');
             }
 
-            // downloadSingleVCF(nama, nomor); // BARIS INI DIHAPUS AGAR TIDAK OTOMATIS MENDOWNLOAD SAAT SIMPAN
-
             const newContact = {
                 id: Date.now() + Math.random(),
                 name: nama,
@@ -463,7 +563,6 @@
                 }).catch(err => console.error(err));
             }
 
-            // Reset pencarian jika ada text agar kontak baru langsung terlihat
             document.getElementById('searchInput').value = "";
 
             namaInput.value = "";
@@ -521,7 +620,7 @@
                 });
 
                 if (importedCount > 0) {
-                    document.getElementById('searchInput').value = ""; // Reset form pencarian
+                    document.getElementById('searchInput').value = ""; 
                     saveContactsToStorage();
                     
                     if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
@@ -544,14 +643,12 @@
             reader.readAsText(file);
         }
 
-        // FITUR BARU: Fungsi untuk memfilter list berdasarkan input pencarian
         function filterContacts() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             const items = document.querySelectorAll('.contact-item');
             let hasResults = false;
             let visibleCount = 0;
 
-            // Hapus pesan "tidak ditemukan" yang lama jika ada
             const oldNoResult = document.getElementById('noSearchResult');
             if (oldNoResult) oldNoResult.remove();
 
@@ -559,7 +656,6 @@
                 const nameText = item.querySelector('.contact-name-text').textContent.toLowerCase();
                 const phoneText = item.querySelector('.contact-phone-text').textContent.toLowerCase();
 
-                // COCOKKAN NAMA ATAU NOMOR TELEPON
                 if (nameText.includes(keyword) || phoneText.includes(keyword)) {
                     item.style.display = 'flex';
                     hasResults = true;
@@ -569,7 +665,6 @@
                 }
             });
 
-            // Update badge angka counter real-time sesuai hasil pencarian
             const counter = document.getElementById('contactCounter');
             if (counter) {
                 if (keyword !== "") {
@@ -579,7 +674,6 @@
                 }
             }
 
-            // Tampilkan pesan jika tidak ada kontak yang cocok dengan keyword
             if (!hasResults && savedContacts.length > 0) {
                 const contactList = document.getElementById('contactList');
                 const li = document.createElement('li');
@@ -605,23 +699,26 @@
             if (savedContacts.length === 0) {
                 contactList.innerHTML = `<li class="empty-state" id="emptyState">Belum ada kontak yang disimpan.</li>`;
                 btnDownloadAll.style.display = "none";
-                searchContainer.style.display = "none"; // Sembunyikan kolom pencarian jika database kosong
+                searchContainer.style.display = "none";
                 return;
             }
 
             btnDownloadAll.style.display = "flex";
-            searchContainer.style.display = "block"; // Munculkan kolom pencarian jika ada minimal 1 kontak
+            searchContainer.style.display = "block";
 
             savedContacts.forEach(contact => {
+                // Escape kutip untuk meminimalisir error onClick
+                const safeName = contact.name.replace(/'/g, "\\'"); 
                 const li = document.createElement('li');
                 li.className = 'contact-item';
+                // BARU: Menambahkan onClick pada div .contact-info untuk memanggil showContactPopup()
                 li.innerHTML = `
-                    <div class="contact-info">
+                    <div class="contact-info" onclick="showContactPopup('${safeName}', '${contact.phone}')" title="Lihat Profil">
                         <span class="contact-name-text">${contact.name}</span>
                         <span class="contact-phone-text">+${contact.phone}</span>
                     </div>
                     <div class="action-group">
-                        <button class="action-list-btn btn-list-dl" onclick="downloadSingleVCF('${contact.name}', '${contact.phone}')" title="Download VCF">
+                        <button class="action-list-btn btn-list-dl" onclick="downloadSingleVCF('${safeName}', '${contact.phone}')" title="Download VCF">
                             <i class="fa-solid fa-file-arrow-down"></i>
                         </button>
                         <a href="https://wa.me/${contact.phone}" target="_blank" class="action-list-btn btn-list-wa" title="Chat WA">
@@ -635,9 +732,35 @@
                 contactList.appendChild(li);
             });
 
-            // Jalankan filter ulang jika user sedang mengetik saat merender (misal sehabis hapus data)
             filterContacts();
         }
+
+        // === BARU: FUNGSI UNTUK MENAMPILKAN DAN MENUTUP POPUP MODAL ===
+        function showContactPopup(name, phone) {
+            const modal = document.getElementById('contactModal');
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalPhone').textContent = '+' + phone;
+            document.getElementById('modalChatBtn').href = 'https://wa.me/' + phone;
+            
+            // Membuat URL Gambar Avatar menggunakan layanan UI Avatars API (otomatis inisial nama)
+            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=e8f5e9&color=25D366&size=150&bold=true&rounded=true`;
+            document.getElementById('modalImg').src = avatarUrl;
+            
+            modal.classList.add('active');
+        }
+
+        function closeContactPopup() {
+            document.getElementById('contactModal').classList.remove('active');
+        }
+
+        // Menutup popup saat klik di area abu-abu (luar modal)
+        window.onclick = function(event) {
+            const modal = document.getElementById('contactModal');
+            if (event.target === modal) {
+                closeContactPopup();
+            }
+        }
+        // =============================================================
 
         function downloadSingleVCF(name, phone) {
             const vcardStr = 
