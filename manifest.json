@@ -1,6 +1,6 @@
 {
   "name": "Generator & Penyimpan Kontak WA",
-  "short_name": "Kontak WA",
+  "short_name": "kontak",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
