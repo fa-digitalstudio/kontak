@@ -1,9 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator & Penyimpan Kontak WA</title>
+    <!-- Tambahan untuk PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#25D366">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kontak WA">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="description" content="Simpan dan kelola kontak WhatsApp dengan mudah, bisa diinstal seperti aplikasi">
+    <!-- Akhir tambahan PWA -->
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -693,7 +704,20 @@
     </div>
 
     <script>
-        // HANYA MASUKKAN 1 URL API GOOGLE SHEETS ANDA (Tidak ada teks APP_PASSWORD di sini)
+        // Tambahan untuk PWA: Daftarkan Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker terdaftar:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker gagal terdaftar:', err);
+                    });
+            });
+        }
+
+        // === HANYA MASUKKAN 1 URL API GOOGLE SHEETS ANDA (Tidak ada teks APP_PASSWORD di sini) ===
         const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
         
         let savedContacts = [];
