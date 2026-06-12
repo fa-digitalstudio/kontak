@@ -9,7 +9,7 @@
   "description": "Simpan dan kelola kontak WhatsApp dengan mudah, sinkron dengan Google Sheets",
   "icons": [
     {
-      "src": "20260612_114505.png",
+      "src": "/20260612_114505.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
