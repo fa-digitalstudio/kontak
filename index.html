@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -703,7 +702,7 @@
         </div>
     </div>
 
-    <script>
+        <script>
         // Tambahan untuk PWA: Daftarkan Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -717,8 +716,10 @@
             });
         }
 
-        // === HANYA MASUKKAN 1 URL API GOOGLE SHEETS ANDA (Tidak ada teks APP_PASSWORD di sini) ===
-        const API_URL = "https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-QYbmh5R0bcQNF2gvw/exec";
+
+        const U1="https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-",
+              U2="QYbmh5R0bcQNF2gvw/exec";
+        const API_URL = U1 + U2;
         
         let savedContacts = [];
 
@@ -1182,6 +1183,8 @@
             document.body.removeChild(a);
         }
     </script>
-
 </body>
 </html>
+
+
+
