@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator & Penyimpan Kontak WA</title>
+    <title>Direktori Kontak WA</title>
     <!-- Tambahan untuk PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#25D366">
+    <meta name="theme-color" content="#1B2430">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kontak WA">
@@ -14,19 +14,35 @@
     <meta name="description" content="Simpan dan kelola kontak WhatsApp dengan mudah, bisa diinstal seperti aplikasi">
     <!-- Akhir tambahan PWA -->
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
+        :root {
+            --navy: #1B2430;
+            --paper: #FBF3E1;
+            --paper-soft: #F1E6CC;
+            --ink: #21262E;
+            --muted: #8A7860;
+            --mustard: #E7A33E;
+            --mustard-deep: #C9842A;
+            --forest: #2F8F5B;
+            --forest-deep: #226B44;
+            --brick: #B6432E;
+            --brick-deep: #8F341F;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #e0f2f1 0%, #e8f5e9 100%);
+            background-color: var(--navy);
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 22px 22px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -39,7 +55,9 @@
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #e0f2f1 0%, #e8f5e9 100%);
+            background-color: var(--navy);
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 22px 22px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -72,13 +90,13 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #888;
+            color: var(--muted);
             font-size: 16px;
             transition: color 0.2s;
         }
 
         .toggle-pwd-btn:hover {
-            color: #25D366;
+            color: var(--mustard-deep);
         }
 
         .checkbox-group {
@@ -87,7 +105,7 @@
             gap: 8px;
             margin-bottom: 20px;
             font-size: 13px;
-            color: #4a4a4a;
+            color: var(--ink);
             font-weight: 600;
         }
 
@@ -95,31 +113,54 @@
             width: 16px;
             height: 16px;
             cursor: pointer;
-            accent-color: #25D366;
+            accent-color: var(--mustard-deep);
         }
 
         .container {
-            background: #ffffff;
+            background: var(--paper);
             width: 100%;
             max-width: 450px;
-            padding: 35px 30px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(4, 38, 20, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            padding: 34px 30px;
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(10, 14, 20, 0.35);
+            border: 1px solid rgba(33, 38, 46, 0.06);
             margin-bottom: 25px;
             position: relative;
         }
 
+        /* Motif "robekan tiket" pemisah header & form pada halaman login */
+        .ticket-tear {
+            position: relative;
+            height: 0;
+            margin: 0 -30px 26px;
+            border-top: 2px dashed rgba(33, 38, 46, 0.2);
+        }
+
+        .ticket-tear::before,
+        .ticket-tear::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--navy);
+        }
+
+        .ticket-tear::before { left: -10px; }
+        .ticket-tear::after { right: -10px; }
+
         .btn-logout-main {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #fff0f2;
-            color: #e11d48;
+            top: 18px;
+            right: 18px;
+            background: var(--paper-soft);
+            color: var(--brick);
             border: none;
             width: 36px;
             height: 36px;
-            border-radius: 12px;
+            border-radius: 50%;
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -129,40 +170,44 @@
         }
 
         .btn-logout-main:hover {
-            background: #e11d48;
+            background: var(--brick);
             color: #ffffff;
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
+            transform: scale(1.06);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .header .icon-box {
-            width: 65px;
-            height: 65px;
-            background: #e8f5e9;
-            color: #25D366;
-            font-size: 28px;
+            width: 64px;
+            height: 64px;
+            background: var(--mustard);
+            color: var(--ink);
+            font-size: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 18px;
-            margin: 0 auto 15px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            outline: 2px dashed var(--mustard-deep);
+            outline-offset: 5px;
         }
 
         .header h1 {
-            font-size: 22px;
-            color: #1a1a1a;
-            font-weight: 700;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 24px;
+            color: var(--ink);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .header p {
             font-size: 13px;
-            color: #666;
-            margin-top: 5px;
+            color: var(--muted);
+            margin-top: 6px;
         }
 
         .form-group {
@@ -172,10 +217,12 @@
 
         .form-group label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4a4a4a;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--ink);
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
         .input-wrapper {
@@ -187,59 +234,63 @@
         .input-wrapper i.fa-user, .input-wrapper i.fa-phone, .input-wrapper i.fa-key {
             position: absolute;
             left: 16px;
-            color: #888;
-            font-size: 16px;
+            color: var(--muted);
+            font-size: 15px;
         }
 
         .form-control {
             width: 100%;
             padding: 14px 16px 14px 45px;
-            border: 2px solid #e0e0e0;
-            border-radius: 14px;
+            border: 2px solid var(--paper-soft);
+            border-radius: 10px;
             font-size: 15px;
-            color: #222;
+            color: var(--ink);
             outline: none;
-            transition: all 0.3s ease;
-            background: #fafafa;
+            transition: all 0.25s ease;
+            background: var(--paper-soft);
         }
 
         .form-control:focus {
-            border-color: #25D366;
+            border-color: var(--mustard-deep);
             background: #fff;
-            box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.15);
+            box-shadow: 0 0 0 4px rgba(231, 163, 62, 0.18);
         }
 
         .action-container {
             display: flex;
             gap: 12px;
-            margin-top: 25px;
+            margin-top: 24px;
         }
 
         .btn-download {
             flex: 2;
-            background: linear-gradient(135deg, #25D366, #1ebd58);
-            color: white;
+            background: var(--mustard);
+            color: var(--ink);
             border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 600;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25);
-            transition: all 0.3s ease;
+            box-shadow: 0 8px 18px rgba(231, 163, 62, 0.35);
+            transition: all 0.25s ease;
         }
 
         .btn-download:hover {
+            background: var(--mustard-deep);
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(37, 211, 102, 0.35);
+            box-shadow: 0 12px 22px rgba(201, 132, 42, 0.4);
         }
 
         .btn-download:disabled {
-            background: #a5d6a7;
+            background: #d8c79c;
+            color: #8a7c5a;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -247,13 +298,13 @@
 
         .btn-upload-file {
             flex: 1;
-            background: #f1f5f9;
-            color: #475569;
-            border: 2px dashed #cbd5e1;
-            border-radius: 14px;
-            padding: 16px;
-            font-size: 14px;
-            font-weight: 600;
+            background: var(--paper-soft);
+            color: var(--ink);
+            border: 2px dashed var(--mustard-deep);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -264,9 +315,9 @@
         }
 
         .btn-upload-file:hover {
-            background: #e2e8f0;
-            border-color: #94a3b8;
-            color: #1e293b;
+            background: #ecdfc0;
+            border-color: var(--brick);
+            color: var(--ink);
         }
 
         #fileInput {
@@ -275,86 +326,107 @@
 
         .note {
             font-size: 11px;
-            color: #888;
+            color: var(--muted);
             text-align: center;
-            margin-top: 15px;
+            margin-top: 16px;
             line-height: 1.5;
         }
 
         .history-container {
-            background: #ffffff;
+            background: var(--paper);
             width: 100%;
             max-width: 450px;
-            padding: 25px 25px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(4, 38, 20, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 14px 32px rgba(10, 14, 20, 0.3);
+            border: 1px solid rgba(33, 38, 46, 0.06);
+            position: relative;
+        }
+
+        /* Motif tepi berlubang seperti lembar perangko / tiket */
+        .history-container::before {
+            content: "";
+            position: absolute;
+            top: -7px;
+            left: 18px;
+            right: 18px;
+            height: 14px;
+            background-image: radial-gradient(circle, var(--navy) 5.5px, transparent 6px);
+            background-size: 16px 14px;
+            background-repeat: repeat-x;
+            background-position: 2px 0;
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .history-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--ink);
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
-        .history-title i { color: #25D366; }
+        .history-title i { color: var(--mustard-deep); }
 
         .btn-download-all {
-            background: #00796b;
+            background: var(--forest);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 7px 12px;
             border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11.5px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-download-all:hover {
-            background: #004d40;
-            box-shadow: 0 4px 10px rgba(0, 121, 107, 0.2);
+            background: var(--forest-deep);
+            box-shadow: 0 4px 10px rgba(47, 143, 91, 0.3);
         }
 
         .btn-delete-all {
-            background: #ffebee;
-            color: #d32f2f;
+            background: #f5e2dc;
+            color: var(--brick);
             border: none;
-            padding: 6px 12px;
+            padding: 7px 12px;
             border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11.5px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-delete-all:hover {
-            background: #d32f2f;
+            background: var(--brick);
             color: white;
-            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
+            box-shadow: 0 4px 10px rgba(182, 67, 46, 0.3);
         }
 
         .search-container {
-            margin-bottom: 15px;
-            display: none; 
+            margin-bottom: 16px;
+            display: none;
         }
 
         .search-wrapper {
@@ -366,26 +438,26 @@
         .search-wrapper i {
             position: absolute;
             left: 14px;
-            color: #94a3b8;
-            font-size: 14px;
+            color: var(--muted);
+            font-size: 13px;
         }
 
         .search-control {
             width: 100%;
             padding: 10px 14px 10px 38px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid var(--paper-soft);
+            border-radius: 9px;
             font-size: 14px;
-            color: #334155;
+            color: var(--ink);
             outline: none;
-            background: #f8fafc;
+            background: var(--paper-soft);
             transition: all 0.2s ease;
         }
 
         .search-control:focus {
-            border-color: #00796b;
+            border-color: var(--mustard-deep);
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+            box-shadow: 0 0 0 3px rgba(231, 163, 62, 0.15);
         }
 
         .contact-list {
@@ -396,21 +468,37 @@
         }
 
         .contact-list::-webkit-scrollbar { width: 5px; }
-        .contact-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .contact-list::-webkit-scrollbar-thumb { background: var(--mustard-deep); border-radius: 10px; }
 
         .contact-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 14px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #edf2f7;
+            padding: 11px 12px;
+            background: var(--paper-soft);
+            border-radius: 10px;
+            margin-bottom: 9px;
+            border: 1px solid rgba(33, 38, 46, 0.05);
             transition: all 0.2s ease;
         }
 
-        .contact-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .contact-item:hover { background: #ecdfc0; border-color: var(--mustard-deep); }
+
+        /* Tab huruf bergaya kartu katalog perpustakaan - elemen signature daftar kontak */
+        .contact-tab {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--paper);
+            margin-right: 11px;
+        }
 
         .contact-info {
             display: flex;
@@ -418,15 +506,27 @@
             gap: 2px;
             flex-grow: 1;
             margin-right: 10px;
-            cursor: pointer; 
-        }
-        
-        .contact-info:hover .contact-name-text {
-            color: #00796b;
+            cursor: pointer;
         }
 
-        .contact-name-text { font-size: 14px; font-weight: 600; color: #1e293b; word-break: break-word; transition: color 0.2s ease; }
-        .contact-phone-text { font-size: 12px; color: #64748b; }
+        .contact-info:hover .contact-name-text {
+            color: var(--brick);
+        }
+
+        .contact-name-text {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+            word-break: break-word;
+            transition: color 0.2s ease;
+            letter-spacing: 0.2px;
+        }
+        .contact-phone-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            color: var(--muted);
+        }
 
         .action-group { display: flex; gap: 6px; }
 
@@ -436,22 +536,22 @@
             justify-content: center; border: none; cursor: pointer; transition: all 0.2s ease;
         }
 
-        .btn-list-dl { background: #e0f2f1; color: #00796b; }
-        .btn-list-dl:hover { background: #00796b; color: white; }
+        .btn-list-dl { background: #e3d6b4; color: var(--mustard-deep); }
+        .btn-list-dl:hover { background: var(--mustard-deep); color: white; }
 
-        .btn-list-wa { background: #e8f5e9; color: #25D366; }
-        .btn-list-wa:hover { background: #25D366; color: white; }
+        .btn-list-wa { background: #dceee2; color: var(--forest); }
+        .btn-list-wa:hover { background: var(--forest); color: white; }
 
-        .btn-list-del { background: #ffebee; color: #d32f2f; }
-        .btn-list-del:hover { background: #d32f2f; color: white; }
+        .btn-list-del { background: #f5e2dc; color: var(--brick); }
+        .btn-list-del:hover { background: var(--brick); color: white; }
 
-        .empty-state { text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0; }
+        .empty-state { text-align: center; color: var(--muted); font-size: 13px; padding: 20px 0; }
 
         /* === STYLING POPUP MODAL UMUM === */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(17, 22, 30, 0.55);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -468,13 +568,13 @@
         }
 
         .modal-box {
-            background: #ffffff;
+            background: var(--paper);
             width: 90%;
             max-width: 320px;
-            border-radius: 24px;
+            border-radius: 16px;
             padding: 30px 20px 25px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 24px 48px rgba(10, 14, 20, 0.4);
             transform: translateY(20px) scale(0.95);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -486,28 +586,29 @@
 
         .modal-close {
             position: absolute;
-            top: 15px; right: 15px;
-            background: #f1f5f9;
+            top: 14px; right: 14px;
+            background: var(--paper-soft);
             border: none;
             width: 32px; height: 32px;
             border-radius: 50%;
-            color: #64748b;
+            color: var(--ink);
             cursor: pointer;
             display: flex; justify-content: center; align-items: center;
             transition: all 0.2s ease;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .modal-close:hover { background: #e2e8f0; color: #1e293b; }
+        .modal-close:hover { background: #ecdfc0; }
 
         .modal-avatar {
-            width: 85px; height: 85px;
+            width: 84px; height: 84px;
             border-radius: 50%;
-            margin: 0 auto 15px;
-            border: 3px solid #25D366;
-            padding: 3px;
-            background: #fff;
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.15);
+            margin: 0 auto 16px;
+            border: 4px solid var(--paper);
+            outline: 2px dashed var(--mustard-deep);
+            outline-offset: 4px;
+            background: var(--paper-soft);
+            box-shadow: 0 10px 22px rgba(10, 14, 20, 0.18);
         }
 
         .modal-avatar img {
@@ -516,20 +617,43 @@
             object-fit: cover;
         }
 
-        .modal-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px; word-break: break-word;}
-        .modal-phone { font-size: 15px; color: #64748b; margin-bottom: 22px; display: flex; justify-content: center; align-items: center; gap: 6px; font-weight: 500;}
-        
+        .modal-name {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-bottom: 8px;
+            word-break: break-word;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px dashed rgba(33, 38, 46, 0.15);
+            padding-bottom: 10px;
+        }
+        .modal-phone {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 10px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
         .modal-actions { display: flex; gap: 10px; justify-content: center; }
         .modal-btn {
-            padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; flex: 1; justify-content: center; transition: all 0.2s ease;
+            padding: 12px 16px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; cursor: pointer; border: none; flex: 1; justify-content: center; transition: all 0.2s ease;
+            text-transform: uppercase; letter-spacing: 0.3px;
         }
-        .modal-btn-chat { background: #25D366; color: white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); }
-        .modal-btn-chat:hover { background: #1ebd58; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
+        .modal-btn-chat { background: var(--forest); color: white; box-shadow: 0 6px 14px rgba(47, 143, 91, 0.3); }
+        .modal-btn-chat:hover { background: var(--forest-deep); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(34, 107, 68, 0.35); }
 
-        .modal-btn-cancel { background: #f1f5f9; color: #475569; }
-        .modal-btn-cancel:hover { background: #e2e8f0; }
-        .modal-btn-danger { background: #e11d48; color: white; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); }
-        .modal-btn-danger:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(225, 29, 72, 0.3); }
+        .modal-btn-cancel { background: var(--paper-soft); color: var(--ink); }
+        .modal-btn-cancel:hover { background: #ecdfc0; }
+        .modal-btn-danger { background: var(--brick); color: white; box-shadow: 0 6px 14px rgba(182, 67, 46, 0.3); }
+        .modal-btn-danger:hover { background: var(--brick-deep); transform: translateY(-2px); box-shadow: 0 8px 16px rgba(143, 52, 31, 0.35); }
     </style>
 </head>
 <body>
@@ -543,7 +667,9 @@
                 <h1>Akses Keamanan</h1>
                 <p>Masukkan kata sandi untuk membuka aplikasi</p>
             </div>
-            
+
+            <div class="ticket-tear"></div>
+
             <div class="form-group" style="margin-bottom: 30px;">
                 <label for="appPasswordInput">Password</label>
                 <div class="input-wrapper">
@@ -600,9 +726,9 @@
                 <button class="btn-download" onclick="processNewContact()">
                     <i class="fa-solid fa-download"></i> Simpan
                 </button>
-                
+
                 <label class="btn-upload-file" for="fileInput">
-                    <i class="fa-solid fa-file-import" style="font-size: 18px; color: #00796b;"></i>
+                    <i class="fa-solid fa-file-import" style="font-size: 18px; color: var(--mustard-deep);"></i>
                     <span>Upload VCF</span>
                 </label>
                 <input type="file" id="fileInput" accept=".vcf" onchange="handleVcfUpload(event)">
@@ -616,9 +742,9 @@
         <div class="history-container">
             <div class="history-header">
                 <div class="history-title">
-                    <i class="fa-solid fa-list-ul"></i> Database Kontak <span id="contactCounter" style="font-size: 12px; font-weight: 500; color: #64748b; margin-left: 6px; background: #f1f5f9; padding: 2px 8px; border-radius: 20px;">(0)</span>
+                    <i class="fa-solid fa-list-ul"></i> Database Kontak <span id="contactCounter" style="font-size: 11px; font-weight: 600; color: var(--muted); margin-left: 6px; background: var(--paper-soft); padding: 3px 9px; border-radius: 20px; font-family: 'IBM Plex Mono', monospace; text-transform: none;">(0)</span>
                 </div>
-                
+
                 <div style="display: flex; gap: 8px;">
                     <button id="btnDeleteAll" class="btn-delete-all" onclick="showDeleteAllPopup()" style="display: none;" title="Hapus Seluruh Kontak">
                         <i class="fa-solid fa-trash-can"></i> Hapus Semua
@@ -628,14 +754,14 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="search-container" id="searchContainer">
                 <div class="search-wrapper">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" class="search-control" placeholder="Cari nama atau nomor kontak..." oninput="filterContacts()">
                 </div>
             </div>
-            
+
             <ul id="contactList" class="contact-list">
                 <li class="empty-state" id="emptyState">Memuat data dari server...</li>
             </ul>
@@ -649,7 +775,7 @@
                 </div>
                 <h3 class="modal-name" id="modalName">-</h3>
                 <div class="modal-phone">
-                    <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> <span id="modalPhone">-</span>
+                    <i class="fa-brands fa-whatsapp" style="color: var(--forest);"></i> <span id="modalPhone">-</span>
                 </div>
                 <div class="modal-actions">
                     <a href="#" id="modalChatBtn" target="_blank" class="modal-btn modal-btn-chat">
@@ -661,11 +787,11 @@
 
         <div class="modal-overlay" id="logoutModal">
             <div class="modal-box">
-                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                <div class="modal-avatar" style="border-color: var(--paper); background: var(--paper-soft); color: var(--brick); outline: 2px dashed var(--brick); display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 10px 22px rgba(10, 14, 20, 0.18);">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </div>
                 <h3 class="modal-name">Konfirmasi Keluar</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin keluar dari aplikasi?</p>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin keluar dari aplikasi?</p>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeLogoutPopup()">Batal</button>
                     <button class="modal-btn modal-btn-danger" onclick="confirmLogout()">Ya, Keluar</button>
@@ -675,11 +801,11 @@
 
         <div class="modal-overlay" id="deleteAllModal">
             <div class="modal-box">
-                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                <div class="modal-avatar" style="border-color: var(--paper); background: var(--paper-soft); color: var(--brick); outline: 2px dashed var(--brick); display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 10px 22px rgba(10, 14, 20, 0.18);">
                     <i class="fa-solid fa-trash-can"></i>
                 </div>
                 <h3 class="modal-name">Hapus Semua Kontak</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus <b>SEMUA</b> kontak? Tindakan ini tidak dapat dibatalkan.</p>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus <b>SEMUA</b> kontak? Tindakan ini tidak dapat dibatalkan.</p>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeDeleteAllPopup()">Batal</button>
                     <button class="modal-btn modal-btn-danger" id="btnConfirmDeleteAll" onclick="confirmDeleteAll()">Ya, Hapus Semua</button>
@@ -689,11 +815,11 @@
 
         <div class="modal-overlay" id="deleteSingleModal">
             <div class="modal-box">
-                <div class="modal-avatar" style="border-color: #ffe4e6; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(225, 29, 72, 0.15);">
+                <div class="modal-avatar" style="border-color: var(--paper); background: var(--paper-soft); color: var(--brick); outline: 2px dashed var(--brick); display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 10px 22px rgba(10, 14, 20, 0.18);">
                     <i class="fa-solid fa-user-minus"></i>
                 </div>
                 <h3 class="modal-name">Hapus Kontak</h3>
-                <p style="font-size: 13px; color: #64748b; margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus kontak ini dari daftar?</p>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.5;">Apakah Anda yakin ingin menghapus kontak ini dari daftar?</p>
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-cancel" onclick="closeDeleteSinglePopup()">Batal</button>
                     <button class="modal-btn modal-btn-danger" onclick="confirmDeleteSingle()">Ya, Hapus</button>
@@ -720,8 +846,16 @@
         const U1="https://script.google.com/macros/s/AKfycbwZkdA6JeTd-BabAigOnVLkAq_y_IWdAI97_7se9XLFnL7DS-",
               U2="QYbmh5R0bcQNF2gvw/exec";
         const API_URL = U1 + U2;
-        
+
         let savedContacts = [];
+
+        // Menentukan warna tab huruf katalog berdasarkan huruf awal nama (signature visual daftar kontak)
+        function getTabStyle(name) {
+            const letter = (name || "?").trim().charAt(0).toUpperCase() || "?";
+            const palette = ["var(--mustard)", "var(--forest)", "var(--brick)"];
+            const code = letter.charCodeAt(0) || 0;
+            return { letter: letter, color: palette[code % palette.length] };
+        }
 
         // === FUNGSI KEAMANAN / LOGIN (Password dicek di server) ===
         document.addEventListener('DOMContentLoaded', () => {
@@ -749,7 +883,7 @@
         function verifyPassword() {
             const inputVal = document.getElementById('appPasswordInput').value;
             const rememberMe = document.getElementById('rememberMeCheck')?.checked;
-            
+
             const btn = document.getElementById('btnLogin');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...';
@@ -770,7 +904,7 @@
                     setTimeout(() => {
                         document.getElementById('mainApp').classList.add('active');
                         loadContactsFromAPI(); // Muat kontak setelah sukses masuk
-                    }, 200); 
+                    }, 200);
                 } else {
                     alert("Password yang Anda masukkan salah!");
                 }
@@ -794,7 +928,7 @@
         function togglePasswordVisibility() {
             const inputField = document.getElementById('appPasswordInput');
             const icon = document.getElementById('togglePwdIcon');
-            
+
             if (inputField.type === "password") {
                 inputField.type = "text";
                 icon.classList.remove('fa-eye');
@@ -817,15 +951,15 @@
         function confirmLogout() {
             // Hapus password yang disimpan di perangkat
             localStorage.removeItem('wa_app_saved_password');
-            
+
             document.getElementById('appPasswordInput').value = '';
             const rememberMeCheck = document.getElementById('rememberMeCheck');
             if(rememberMeCheck) rememberMeCheck.checked = false;
-            
+
             // Kosongkan list di memori HP agar aman
             savedContacts = [];
             document.getElementById('contactList').innerHTML = `<li class="empty-state" id="emptyState">Memuat data dari server...</li>`;
-            
+
             closeLogoutPopup();
             document.getElementById('mainApp').classList.remove('active');
             document.getElementById('loginOverlay').classList.remove('hidden');
@@ -849,7 +983,7 @@
         function processNewContact() {
             const namaInput = document.getElementById('nama');
             const nomorInput = document.getElementById('nomor');
-            
+
             const nama = namaInput.value.trim();
             let nomor = nomorInput.value.trim();
 
@@ -869,7 +1003,7 @@
                 name: nama,
                 phone: nomor
             };
-            
+
             savedContacts.unshift(newContact);
             renderContactList();
 
@@ -904,7 +1038,7 @@
                 matches.forEach(vcard => {
                     let nameMatch = vcard.match(/FN:(.*)/);
                     if (!nameMatch) nameMatch = vcard.match(/N:(.*)/);
-                    
+
                     let telMatch = vcard.match(/TEL;.*:(.*)/);
                     if (!telMatch) telMatch = vcard.match(/TEL:(.*)/);
 
@@ -919,7 +1053,7 @@
                         }
 
                         const isDuplicate = savedContacts.some(c => c.phone === phone);
-                        
+
                         if (!isDuplicate && name && phone) {
                             let newC = {
                                 id: Date.now() + Math.random(),
@@ -934,23 +1068,23 @@
                 });
 
                 if (importedCount > 0) {
-                    document.getElementById('searchInput').value = ""; 
+                    document.getElementById('searchInput').value = "";
                     renderContactList();
-                    
+
                     fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "saveBulk", contacts: importedBatch })
                     })
                     .then(() => alert(`Berhasil mengimpor ${importedCount} kontak baru ke daftar & Google Sheets!`))
                     .catch(err => console.error(err));
-                    
+
                 } else {
                     alert("Tidak ada kontak baru yang ditambahkan (mungkin nomor sudah terdaftar semua).");
                 }
-                
+
                 event.target.value = "";
             };
-            
+
             reader.readAsText(file);
         }
 
@@ -1001,7 +1135,7 @@
             const btnDeleteAll = document.getElementById('btnDeleteAll');
             const searchContainer = document.getElementById('searchContainer');
             const counter = document.getElementById('contactCounter');
-            
+
             contactList.innerHTML = "";
 
             if (counter) {
@@ -1021,10 +1155,12 @@
             searchContainer.style.display = "block";
 
             savedContacts.forEach(contact => {
-                const safeName = contact.name.replace(/'/g, "\\'"); 
+                const safeName = contact.name.replace(/'/g, "\\'");
+                const tab = getTabStyle(contact.name);
                 const li = document.createElement('li');
                 li.className = 'contact-item';
                 li.innerHTML = `
+                    <div class="contact-tab" style="background:${tab.color}">${tab.letter}</div>
                     <div class="contact-info" onclick="showContactPopup('${safeName}', '${contact.phone}')" title="Lihat Profil">
                         <span class="contact-name-text">${contact.name}</span>
                         <span class="contact-phone-text">+${contact.phone}</span>
@@ -1061,10 +1197,10 @@
             btnConfirm.disabled = true;
 
             const idsToDelete = savedContacts.map(c => c.id);
-            
+
             savedContacts = [];
             renderContactList();
-            
+
             if (API_URL && API_URL !== "MASUKKAN_URL_WEB_APP_DI_SINI") {
                 for (const id of idsToDelete) {
                     try {
@@ -1077,12 +1213,12 @@
                     }
                 }
             }
-            
+
             btnConfirm.innerHTML = 'Ya, Hapus Semua';
             btnConfirm.disabled = false;
             closeDeleteAllPopup();
         }
-        
+
         let contactIdToDelete = null;
 
         function deleteContact(id) {
@@ -1098,15 +1234,15 @@
         function confirmDeleteSingle() {
             if (!contactIdToDelete) return;
             const id = contactIdToDelete;
-            
+
             savedContacts = savedContacts.filter(item => item.id != id);
             renderContactList();
-            
+
             fetch(API_URL, {
                 method: "POST",
                 body: JSON.stringify({ action: "delete", id: id })
             }).catch(err => console.error(err));
-            
+
             closeDeleteSinglePopup();
         }
 
@@ -1115,10 +1251,10 @@
             document.getElementById('modalName').textContent = name;
             document.getElementById('modalPhone').textContent = '+' + phone;
             document.getElementById('modalChatBtn').href = 'https://wa.me/' + phone;
-            
-            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=e8f5e9&color=25D366&size=150&bold=true&rounded=true`;
+
+            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=E7A33E&color=21262E&size=150&bold=true&rounded=true`;
             document.getElementById('modalImg').src = avatarUrl;
-            
+
             modal.classList.add('active');
         }
 
@@ -1130,8 +1266,8 @@
             const contactModal = document.getElementById('contactModal');
             const logoutModal = document.getElementById('logoutModal');
             const deleteAllModal = document.getElementById('deleteAllModal');
-            const deleteSingleModal = document.getElementById('deleteSingleModal'); 
-            
+            const deleteSingleModal = document.getElementById('deleteSingleModal');
+
             if (event.target === contactModal) {
                 closeContactPopup();
             } else if (event.target === logoutModal) {
@@ -1139,12 +1275,12 @@
             } else if (event.target === deleteAllModal) {
                 closeDeleteAllPopup();
             } else if (event.target === deleteSingleModal) {
-                closeDeleteSinglePopup(); 
+                closeDeleteSinglePopup();
             }
         }
 
         function downloadSingleVCF(name, phone) {
-            const vcardStr = 
+            const vcardStr =
                 "BEGIN:VCARD\n" +
                 "VERSION:3.0\n" +
                 "FN:" + name + "\n" +
@@ -1160,7 +1296,7 @@
 
             let bulkVcardStr = "";
             savedContacts.forEach(contact => {
-                bulkVcardStr += 
+                bulkVcardStr +=
                     "BEGIN:VCARD\n" +
                     "VERSION:3.0\n" +
                     "FN:" + contact.name + "\n" +
@@ -1185,6 +1321,3 @@
     </script>
 </body>
 </html>
-
-
-
